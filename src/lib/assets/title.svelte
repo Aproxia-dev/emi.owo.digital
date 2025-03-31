@@ -1,7 +1,8 @@
 <script lang='ts'>
+    import { browser } from '$app/environment';
     import { blink } from '$lib/transitions.svelte';
-    let { title, enabled, introover, outroend } = $props();
-    let placeholder = $state(false);
+    let { title, enabled, animon, introover, outroend } = $props();
+    let placeholder = $state(!animon);
 
     function onintrostart() { placeholder = false }
 

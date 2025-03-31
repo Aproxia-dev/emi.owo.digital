@@ -3,12 +3,11 @@
     import subtitles from '$lib/assets/subtitles.json';
     import Social from '$lib/components/social.svelte';
 
-    import { onMount } from 'svelte';
+    // import { onMount } from 'svelte';
     import { blink, typewriter } from '$lib/transitions.svelte'
-    import { backOut, quintOut } from 'svelte/easing';
-    import { Tween } from 'svelte/motion';
-    import { fly, slide } from 'svelte/transition';
-    import { page } from '$app/state';
+    import { backOut } from 'svelte/easing';
+    import { fly } from 'svelte/transition';
+    import { afterNavigate } from '$app/navigation';
 
     import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -22,47 +21,9 @@
     let titleIntroOver: boolean = $state(false);
     let subtitleIn: boolean     = $state(true);
     let subtitleIndex: number = $state(0)
+    let animOn: boolean = $state(false);
     let hoveredSocial: number | null = $state(null);
     let clickedSocial: boolean = $state(false);
-    let selectedTab: number = $state(1);
-    let hoveredTab: number = $state(0);
-    let tabOpen: boolean[] = $state([false, false, false, false])
-    let tabSize: number[] = $state([0, 0, 0, 0, 0])
-    let touchscreen: boolean = $state(false);
-    let closingTimeout: number;
-
-    let tabGlider = Tween.of(() => {
-        let ret: number = 0;
-        if (mounted) {
-            for (let i = 1; i < selectedTab; i++) {
-                ret += (tabOpen[i - 1] || touchscreen ? tabSize[i] : tabSize[0]) + 4
-            }
-        }
-        return ret;
-    }, {
-        duration: 500,
-        easing: quintOut
-    });
-
-    function getTabSizes() {
-        touchscreen = window.matchMedia('(pointer: coarse)').matches;
-
-        tabSize[0] = document.getElementById('glider')!.clientWidth;
-        for (let i = 1; i <= 4; i++) {
-            tabSize[i] = document.getElementById(`tab-size-${i}`)!.clientWidth;
-        }
-    }
-
-    function changeTabHover(id: number) {
-        hoveredTab = id;
-        clearTimeout(closingTimeout!)
-    }
-
-    function leaveTabHover() {
-        closingTimeout = setTimeout(() => {
-            hoveredTab = 0;
-        }, 1)
-    }
 
     let term: HTMLElement = $state(undefined)!; 
 
@@ -84,79 +45,28 @@
         }
     };
 
-    function padTime(i: number): string { return (i >= 10) ? `${i}` : `0${i}` }
-
-    let today = $state(new Date());
-    let h: string = $derived(padTime(((today.getHours() + 11) % 12) + 1));
-    let m: string = $derived(padTime(today.getMinutes()));
-    let p: string = $derived((today.getHours() <= 12) ? "AM" : "PM");
-
-    let clockTime = $derived(`${h}:${m} ${p}`);
-
     function onmouseup() {
         titlebarGrabbed = false;
         clickedSocial = false;
     };
 
-    onMount(() => {
+    afterNavigate(({ from }) => {
         mounted = true;
-        titleReveal = true;
-
         term = document.getElementById('term-border')!;
 
-        getTabSizes();
-
-        const clock = setInterval(() => { today = new Date(); }, 1000)
-        return () => clearInterval(clock);
-    });
+        animOn = (from === null);
+        titleReveal = animOn;
+        if (!animOn) {
+            titleIntroOver = true;
+        }
+    })
 </script>
 
 <svelte:head>
     <title>your mom &lt;3</title>
     <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
-<main transition:fly={{ y: -50 }}>
-    <div id='bar'>
-        <div>Logo</div>
-        <div class='workspaces'>
-            {#snippet tab(id: number, name: string)}
-            <button style='visibility: hidden;position:absolute;' id='tab-size-{id}'><div class='index'>{id}</div><p class='name'>{name}</button>
-            <button
-                onclick={    () => selectedTab = id} class={(selectedTab == id ? 'active' : '')}
-                onmouseover={() => changeTabHover(id)}
-                onfocus={    () => changeTabHover(id)}
-                onmouseout={ () => leaveTabHover()}
-                onblur={     () => leaveTabHover()}
-                id='tab-{id}'
-            >
-                <div class='index'>
-                    <div class='bg' style:background-color={hoveredTab == id ? '#404749' : 'transparent'}></div>
-                    <div class='id' style:color={selectedTab == id ? '#0a1114' : '#dadada'}>{id}</div>
-                </div>
-                {#if (selectedTab == id || hoveredTab == id) || touchscreen}
-                    <p
-                        class='name'
-                        transition:slide={{
-                            axis: 'x',
-                            duration: 500,
-                            easing: quintOut
-                        }}
-                        onintrostart={() => tabOpen[id - 1] = true  }
-                        onoutrostart={() => tabOpen[id - 1] = false }
-                    >{name}</p>
-                {/if}
-            </button>
-            {/snippet}
-
-            {@render tab(1, 'Home')}
-            {@render tab(2, 'About Me')}
-            {@render tab(3, 'Blog')}
-            {@render tab(4, 'Projects')}
-            <span id='glider' style:--pos={`${tabGlider.current}px`}></span>
-        </div>
-        <div class='button'>{clockTime}</div>
-    </div>
-
+<main>
     <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : 2147483647}px; --termWidth: {(term) ? term.offsetWidth / 2 : 2147483647}px;'>
         <div id='titlebar' onmousedown={grabTitlebar} role='none'>
             <span style='width:100px;'>
@@ -180,6 +90,7 @@
                                 <Title 
                                     title={title} 
                                     enabled={titleReveal} 
+                                    animon={animOn}
                                     introover={titleIntroOver}
                                     outroend={(title == 2) ?
                                         () => titleIntroOver = true :
@@ -188,8 +99,8 @@
                             </div>
                         {/each}
                         <div class='title main-title'
-                            in:blink|global={{ delay: 400 }}
-                            onintroend={() => (titleReveal = false)}
+                            in:blink={{delay: animOn ? 400 : 0 }}
+                            onintroend={() =>  titleReveal = false }
                             onmouseover={() => { if (titleIntroOver) titleReveal = true  } } 
                             onmouseout={ () => { if (titleIntroOver) titleReveal = false } } 
                             role='none'
@@ -199,7 +110,7 @@
                     {/if}
                 </div>
                 <p class='subtitle'>
-                    {#if (titleIntroOver && subtitleIn)}
+                    {#if ((titleIntroOver) && subtitleIn)}
                         <span
                             in:typewriter={{ delay: 100, speed: 200 }}
                             out:typewriter={{ delay: 1500, backspace: true }}
@@ -210,12 +121,13 @@
                     {/if}
                 &#8203;</p>
                 <div id='socials'>
-                    {#if titleIntroOver}
                     {#each socials as social, i}
+                    {#if titleIntroOver}
                         <button class='social'
-                            transition:fly|global={{
+                            in:fly={{
                                 y: 50,
-                                delay: 500 + 200 * i,
+                                delay: (animOn ? (500 + 200 * i) : 0),
+                                duration: (animOn ? 400 : 0),
                                 easing: backOut,
                             }}
                             onmouseover={() => hoveredSocial = i}
@@ -226,10 +138,10 @@
                         >
                             <Social name={social} hoverPos={(hoveredSocial === null) ? null : (i - hoveredSocial)} clicked={clickedSocial}/>
                         </button>
-                    {/each}
                     {:else}
                         <p>&#8203;</p>
                     {/if}
+                    {/each}
                 </div>
             </div>
             <div class='prompt'>
@@ -242,9 +154,7 @@
 <svelte:window {onmouseup} onmousemove={moveTitlebar} />
 
 <style lang="scss">
-    button {
-        all: unset;
-    }
+    button { all: unset; }
     
     main { 
         width: 100vw;
@@ -253,112 +163,6 @@
         margin: 0;
     }
 
-    #bar {
-        width: 80%;
-        height: 1.5em;
-        margin: 8px auto;
-        padding: 4px 8px;
-        border-radius: 8px;
-        background-color: #141b1e;
-        color: #dadada;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 1;
-        position: relative;
-        border: 2px solid #232a2d;
-        
-        font-family: 'Iosevka', monospace;
-
-        .workspaces {
-            position: relative;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 4px;
-            
-            button { 
-                border-radius: 8px;
-                background-color: #0a1114;
-                // border: 2px solid #404749;
-                cursor: pointer;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                user-select: none;
-                
-                transition: background-color 0.2s easeOutSine;
-
-                &:hover, &:is(.active) { 
-                    background-color: #232a2d;
-                }
-
-                div.index {
-                    display: grid;
-                    grid-template: 1fr / 1fr;
-                    place-items: center;
-                    height: 100%;
-                    width: calc(1.5em);
-                    div {
-                        grid-column: 1 / 1;
-                        grid-row: 1 / 1;
-                        height: calc(100% - 8px);
-                        padding: 2px 4px;
-                        border-radius: 8px;
-                        width: calc(1.5em - 8px);
-                        text-align: center;
-                        transition: background-color 0.2s easeOutSine;
-
-                        &.id { z-index: 3; padding-bottom: 4px; transition: color 0.2s easeOutSine; }
-                    }
-                }
-                
-                p {
-                    all: unset;
-                    display: block;
-                    padding: 2px 4px;
-                    height: 100%;
-                    text-align: center;
-                    transition: background-color 0.2s easeOutSine;
-
-
-                    &.name {
-                        margin-left: 6px;
-                        white-space: nowrap;
-                        overflow: hidden;
-                    }
-                }
-            }
-
-            span#glider {
-                position: absolute;
-                width: calc(1.5em);
-                height: calc(1.5em);
-                border-radius: 8px;
-                left: var(--pos);
-                // top: 0;
-                pointer-events: none;
-                z-index: 2;
-
-                transition: all 0.4s quintOut;
-                // left: anchor(left);
-
-                background-color: #67b0e8;
-                // background-color: none;
-            }
-        }
-
-        div.button {
-            border-radius: 8px;
-            background-color: #0a1114;
-            padding: 4px;
-            cursor: default;
-            white-space: nowrap;
-
-            &:hover { background-color: #232a2d; }
-        }
-    }
-    
     #term-border {
         position: absolute;
         padding: 4px;
@@ -516,7 +320,7 @@
     }
     
     .social { 
-        font-family: 'Roboto Condensed', serif;
+        font-family: 'Atkinson Hyperlegible', sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;

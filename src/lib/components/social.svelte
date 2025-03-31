@@ -33,6 +33,7 @@
     p.icon { 
         margin: 0 auto;
         text-align: center;
+        transition: transform 0.3s easeOutCirc;
         transition: all 0.6s easeOutCirc;
     }
 
