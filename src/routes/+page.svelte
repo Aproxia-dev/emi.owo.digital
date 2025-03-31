@@ -1,30 +1,40 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import '@fortawesome/fontawesome-free/css/all.min.css';
-    import Title_0 from '$lib/assets/title-anim/title-0.svelte';
-    import Title_1 from '$lib/assets/title-anim/title-1.svelte';
-    import Title_2 from '$lib/assets/title-anim/title-2.svelte';
+    import Title from '$lib/assets/title.svelte';
 
     import { fade, fly } from 'svelte/transition';
+    import { blink, typewriter } from '$lib/transitions.svelte'
     import { backOut } from 'svelte/easing';
 
     import '../main.scss';
     import '$lib/assets/no-overflow.scss';
 
     let socials: string[] = [
-        "<p><i class='fa-brands fa-youtube'></i></p>",
-        "<p style='width:1em;height:1em;line-height:1em;text-align:center;border-radius:50%;color:#141b1e;background-color:#b3b9b8'>⁂</p>",
-        "<p><i class='fa-brands fa-github'></i></p>",
-        "<p><i class='fa-brands fa-discord'></i></p>",
+        "<p style='margin:0 auto;'><i class='fa-brands fa-youtube'></i></p>",
+        "<p style='width:1em;height:1em;line-height:0.85em;margin:0 auto;border-radius:50%;color:#141b1e;background-color:#b3b9b8' class='fa-text-height'>⁂</p>",
+        "<p style='margin:0 auto;'><i class='fa-brands fa-github'></i></p>",
+        "<p style='margin:0 auto;'><i class='fa-brands fa-discord'></i></p>",
     ]
 
+        // <p onmouseover={() => hoveredSocial = 'YouTube'}   onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-youtube'></i></p>
+        // <p onmouseover={() => hoveredSocial = 'Fediverse'} onmouseout={() => hoveredSocial = '  '} style='width:1em;height:1em;line-height:0.85em;margin:0 auto;border-radius:50%;color:#141b1e;background-color:#b3b9b8' class='fa-text-height'>⁂</p>
+        // <p onmouseover={() => hoveredSocial = 'GitHub'}    onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-github'></i></p>
+        // <p onmouseover={() => hoveredSocial = 'Discord'}   onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-discord'></i></p>
+
+    let mounted: boolean = $state(false);
+    let titleanim: boolean = $state(false);
+    let titleanimOver: boolean = $state(false);
+    let selectedTab: number = $state(1);
+    let hoveredSocial: string = $state('  ');
+    $inspect(hoveredSocial);
+
+    let term: HTMLElement = $state(undefined)!; 
 
     let top: number = $state(0);
     let left: number = $state(0);
 
     let grabbed: boolean = $state(false);
-
-    let fadeIn: boolean = $state(false);
 
     function onmousedown() { grabbed = true; };
     function onmouseup() { grabbed = false; };
@@ -35,7 +45,12 @@
         }
     }
 
-    onMount(() => fadeIn = true);
+    onMount(() => {
+        mounted = true;
+        titleanim = true;
+
+        term = document.getElementById('term-border')!;
+    });
 </script>
 
 <svelte:head>
@@ -44,8 +59,8 @@
 </svelte:head>
 
 <main>
-    <div class='term-border' style='--top: {top}px; --left: {left}px;'>
-        <div class='titlebar' {onmousedown} role='toolbar' aria-grabbed={grabbed} tabindex='0'>
+    <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : Infinity}px; --termWidth: {(term) ? term.offsetWidth / 2 : Infinity}px; visibility: {mounted ? 'visible' : 'hidden'};'>
+        <div id='titlebar' {onmousedown} role='toolbar' aria-grabbed={grabbed} tabindex='0'>
             <span style='width:100px;'>
                 <i class="fa-solid fa-terminal"></i>
             </span>
@@ -56,49 +71,76 @@
                 <div class='term-button' style='background-color:#e57474'></div>
             </div>
         </div>
-        <div class='term-window'>
+        <div id='term-window'>
             <div class='titles'>
-                <div class='title title-0'><Title_0 /></div>
-                <div class='title title-1'><Title_1 /></div>
-                <div class='title title-2'><Title_2 /></div>
-                <div class='title title-3'><h1>Apro</h1></div>
-            </div>
-            <p class='subtitle'>figuring out how to make this animated</p>
-            <div class='socials'>
-                {#if fadeIn}
-                    {#each socials as social, i}
-                        <div style='flex-shrink:0;' transition:fly|global={{
-                            y: 50,
-                            delay: 1000 + 200 * i,
-                            easing: backOut,
-                        }}>
-                        {@html social}
+                {#if mounted}
+                    {#each [0, 1, 2] as title}
+                        <div class='title'>
+                            <Title 
+                                title={title} 
+                                delay={100 + 100 * title} 
+                                enabled={titleanim} 
+                                outroend={(title == 2) ?
+                                    () => titleanimOver = true :
+                                    () => void 0}
+                                />
                         </div>
                     {/each}
+                    <div class='title main-title' in:blink|global={{ delay: 400 }} onintroend={() => (titleanim = false)}><h1>Apro</h1></div>
+                {/if}
+            </div>
+            <p class='subtitle'>
+                &nbsp;
+                {#if (titleanimOver)}
+                    <span
+                        in:typewriter={{ speed: 200 }}
+                        out:typewriter={{ backspace: true }}
+                    >figuring out how to make this animated</span>
+                {/if}
+                &nbsp;
+            </p>
+            <div id='socials'>
+                {#if titleanimOver}
+                {#each socials as social, i}
+                    <div class='social' transition:fly|global={{
+                        y: 50,
+                        delay: 500 + 200 * i,
+                        easing: backOut,
+                    }}>
+                    {@html social}
+                    </div>
+                {/each}
                 {:else}
                     <p>&nbsp;</p>
                 {/if}
             </div>
+            <p class='social-name'>{@html hoveredSocial}</p>
             <div class='prompt'>
                 <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
         </div>
+        <!-- <div class='tabs'>
+            <p onclick={() => selectedTab = 1} class={(selectedTab == 1 ? 'active' : '')}>1: Home</p>
+            <p onclick={() => selectedTab = 2} class={(selectedTab == 2 ? 'active' : '')}>2: About me</p>
+            <p onclick={() => selectedTab = 3} class={(selectedTab == 3 ? 'active' : '')}>3: Blog</p>
+            <p onclick={() => selectedTab = 4} class={(selectedTab == 4 ? 'active' : '')}>4: Projects</p>
+        </div> -->
     </div>
 </main>
 
 <svelte:window {onmouseup} {onmousemove} />
 
 <style lang="scss">
-    .term-border {
+    #term-border {
         position: absolute;
         padding: 4px;
         border-radius: 12px;
         background-color: #67b0e8;
-        top: calc(27.5vh - 4px + var(--top));
-        left: calc(32.5vw - 4px + var(--left));
+        top:  calc(50vh - var(--termHeight) + var(--top));
+        left: calc(50vw - var(--termWidth)  + var(--left));
     }
 
-    .titlebar {
+    #titlebar {
         cursor: move;
         display: flex;
         justify-content: space-between;
@@ -130,21 +172,16 @@
         }
     }
 
-    .term-window {
+    #term-window {
         background-color: #141b1e;
         border-radius: 8px;
         padding: 12px;
-        width: 35vw;
-        height: 45vh;
+        min-width: 35vw;
+        min-height: 45vh;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-    }
-
-    @keyframes title-blink {
-        0%   { visibility: hidden; }
-        100%  { visibility: visible; }
     }
 
     .titles {
@@ -156,28 +193,12 @@
     }
 
     .title {
-        visibility: hidden;
-        animation: title-blink 0.5s;
         margin-top: -3rem;
         margin-bottom: -3rem;
     }
 
-    $title-delay: 0.2s;
-
-    .title-0 {
-        animation-delay: $title-delay;
-        margin-bottom: -4rem;
-    }
-    .title-1 {
-        animation-delay: calc($title-delay + 0.1s);
-    }
-    .title-2 {
-        animation-delay: calc($title-delay + 0.2s);
-    }
-    .title-3 {
+    .main-title {
         font-family: "Iosevka";
-        animation-fill-mode: forwards;
-        animation-delay: calc($title-delay + 0.3s);
         pointer-events: fill;
         h1 {
             margin-top: -3rem;
@@ -188,21 +209,38 @@
     .subtitle {
         color: #dadada;
         font-family: 'Iosevka', monospace;
-        margin-top: 2rem;
+        margin-top: 1rem;
         margin-bottom: -1rem;
         font-size: 1.5rem;
     }
 
-    .socials {
+    #socials {
         width: 70%;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
         color: #b3b9b8;
-        font-size: 3rem;
         user-select: none;
-        line-height: 3rem;
+        margin-top: 1rem;
+        height: 4rem;
+    }
+    
+    .social { 
+        font-family: 'Roboto Condensed', serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        transition: all 0.3s cubic-bezier(0, 0.55, 0.45, 1);
+        line-height: 1em;
+        font-size: 3rem;
+        text-align: center;
+        height: 1em;
+        width: 1em;
+
+        &:hover {
+            font-size: 5rem;
+        }
     }
 
     @keyframes cursor-blink {
@@ -215,7 +253,7 @@
         font-family: 'Iosevka', monospace;
         font-size: 12pt;
         width: 100%;
-        flex-shrink: 999;
+        line-height: 0;
 
         .ps1 { display: inline-block; }
         .pwd    { color: #c47fd5; }
@@ -229,6 +267,17 @@
         .cursor {
             animation: cursor-blink 1s cubic-bezier(0.83, 0, 0.17, 1) infinite;
             color: #dadada;
+        }
+    }
+
+    .tabs {
+        display: grid;
+        grid-template-columns: 25% 25% 25% 25%;
+        height: 100%;
+        * { height: 100%; }
+
+        .active {
+            background-color: #c47fd5;
         }
     }
 </style>
