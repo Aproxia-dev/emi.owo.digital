@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import '@fortawesome/fontawesome-free/css/all.min.css';
     import Title from '$lib/assets/title.svelte';
+    import Social from '$lib/components/social.svelte';
 
     import { fade, fly } from 'svelte/transition';
     import { blink, typewriter } from '$lib/transitions.svelte'
@@ -10,24 +11,20 @@
     import '../main.scss';
     import '$lib/assets/no-overflow.scss';
 
-    let socials: string[] = [
-        "<p style='margin:0 auto;'><i class='fa-brands fa-youtube'></i></p>",
-        "<p style='width:1em;height:1em;line-height:0.85em;margin:0 auto;border-radius:50%;color:#141b1e;background-color:#b3b9b8' class='fa-text-height'>⁂</p>",
-        "<p style='margin:0 auto;'><i class='fa-brands fa-github'></i></p>",
-        "<p style='margin:0 auto;'><i class='fa-brands fa-discord'></i></p>",
-    ]
-
-        // <p onmouseover={() => hoveredSocial = 'YouTube'}   onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-youtube'></i></p>
-        // <p onmouseover={() => hoveredSocial = 'Fediverse'} onmouseout={() => hoveredSocial = '  '} style='width:1em;height:1em;line-height:0.85em;margin:0 auto;border-radius:50%;color:#141b1e;background-color:#b3b9b8' class='fa-text-height'>⁂</p>
-        // <p onmouseover={() => hoveredSocial = 'GitHub'}    onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-github'></i></p>
-        // <p onmouseover={() => hoveredSocial = 'Discord'}   onmouseout={() => hoveredSocial = '  '} style='margin:0 auto;'><i class='fa-brands fa-discord'></i></p>
+    let socials: string[][] = [
+        ["<i class='fa-brands fa-youtube'></i>", "YouTube"],
+        ["⁂", "Fediverse"],
+        ["<i class='fa-brands fa-github'></i>", "GitHub"],
+        ["<i class='fa-brands fa-discord'></i>", "Discord"],
+    ] // ⁂
 
     let mounted: boolean = $state(false);
     let titleanim: boolean = $state(false);
     let titleanimOver: boolean = $state(false);
     let selectedTab: number = $state(1);
-    let hoveredSocial: string = $state('  ');
-    $inspect(hoveredSocial);
+    let hoveredSocial: number | null = $state(null);
+
+    // $inspect(hoveredSocial, 'hoveredSocial');
 
     let term: HTMLElement = $state(undefined)!; 
 
@@ -60,7 +57,7 @@
 
 <main>
     <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : Infinity}px; --termWidth: {(term) ? term.offsetWidth / 2 : Infinity}px; visibility: {mounted ? 'visible' : 'hidden'};'>
-        <div id='titlebar' {onmousedown} role='toolbar' aria-grabbed={grabbed} tabindex='0'>
+        <div id='titlebar' {onmousedown} role='none'>
             <span style='width:100px;'>
                 <i class="fa-solid fa-terminal"></i>
             </span>
@@ -102,19 +99,25 @@
             <div id='socials'>
                 {#if titleanimOver}
                 {#each socials as social, i}
-                    <div class='social' transition:fly|global={{
-                        y: 50,
-                        delay: 500 + 200 * i,
-                        easing: backOut,
-                    }}>
-                    {@html social}
-                    </div>
+                    <div class='social'
+                        transition:fly|global={{
+                            y: 50,
+                            delay: 500 + 200 * i,
+                            easing: backOut,
+                        }}
+                        role='tooltip'
+                        onmouseover={() => hoveredSocial = i}
+                        onfocus={() => hoveredSocial = i}
+                        onmouseout={() => hoveredSocial = null}
+                        onblur={() => hoveredSocial = null}
+                    >
+                        <Social icon={social[0]} name={social[1]} hoverId={(hoveredSocial === null) ? null : (i - hoveredSocial)}/>
+                </div>
                 {/each}
                 {:else}
                     <p>&nbsp;</p>
                 {/if}
             </div>
-            <p class='social-name'>{@html hoveredSocial}</p>
             <div class='prompt'>
                 <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
@@ -131,6 +134,7 @@
 <svelte:window {onmouseup} {onmousemove} />
 
 <style lang="scss">
+    
     #term-border {
         position: absolute;
         padding: 4px;
@@ -223,6 +227,8 @@
         color: #b3b9b8;
         user-select: none;
         margin-top: 1rem;
+        margin-left: auto;
+        margin-right: auto;
         height: 4rem;
     }
     
@@ -231,16 +237,12 @@
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-        transition: all 0.3s cubic-bezier(0, 0.55, 0.45, 1);
         line-height: 1em;
         font-size: 3rem;
         text-align: center;
-        height: 1em;
-        width: 1em;
-
-        &:hover {
-            font-size: 5rem;
-        }
+        // height: 2em;
+        padding: 0 5%;
+        width: 100%;
     }
 
     @keyframes cursor-blink {
@@ -270,14 +272,14 @@
         }
     }
 
-    .tabs {
-        display: grid;
-        grid-template-columns: 25% 25% 25% 25%;
-        height: 100%;
-        * { height: 100%; }
+    // .tabs {
+    //     display: grid;
+    //     grid-template-columns: 25% 25% 25% 25%;
+    //     height: 100%;
+    //     * { height: 100%; }
 
-        .active {
-            background-color: #c47fd5;
-        }
-    }
+    //     .active {
+    //         background-color: #c47fd5;
+    //     }
+    // }
 </style>
