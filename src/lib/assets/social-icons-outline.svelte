@@ -15,12 +15,6 @@
     <path d="M38.23 16.92 25.772 9.734m0 7.187 12.454-7.187M32 20.514V6.14M16.667 54.267 4.21 47.079m-.002 7.188 12.455-7.188M10.438 57.86V43.485M59.79 54.267l-12.455-7.188m-.002 7.188 12.455-7.188M53.562 57.86V43.485" fill="none" stroke-width="4.31244"/>
   </g>
 </svg>
-<!-- <svg width="1em" height="1em" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" class='{name.toLowerCase()}-icon'>
-  <g stroke="currentColor" stroke-width="3.564" stroke-linecap="round">
-    <path d="m36.453 22.782 8.911 15.432zM23.088 45.934l17.82-.001zm-4.451-7.712 8.909-15.433z" stroke-linejoin="round"/>
-    <path d="m37.148 18.037-10.294-5.939m-.001 5.94 10.293-5.94M32 21.008V9.127M19.328 48.902l-10.294-5.94m-.002 5.94 10.294-5.94m-5.146 8.91v-11.88m40.788 8.91-10.294-5.94m-.001 5.94 10.293-5.94m-5.146 8.91v-11.88" fill="none"/>
-  </g>
-</svg> -->
 {:else if (name.toLowerCase()) === 'github'}
 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class='{name.toLowerCase()}-icon'>
     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
@@ -36,12 +30,14 @@
 </div>
 
 <style lang='scss'>
-  // div {
-  //   border-radius:50%;
-  //   background-color:#b3b9b8;
-  //   height: 1.1em;
-  //   width: 1.1em;
-  // }
+  div {
+    // border-radius:50%;
+    // outline: #b3b9b8 solid 3px;
+    // background-color:#b3b9b8;
+    // background-color: #232a2d;
+    height: 1.1em;
+    width: 1.1em;
+  }
 
     svg {
         margin:0 auto;
@@ -52,7 +48,7 @@
         color:#b3b9b8;
 
         // &:is(.github-icon) { transform: translate(0, 0.05em); }
-        // &:is(.fediverse-icon) { transform: scale(110%);}
+        // &:is(.fediverse-icon) { transform: translate(0, -0.05em);}
 
         // &:not(.fediverse-icon, .github-icon) {
         //     font-size: 0.9em;

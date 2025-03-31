@@ -76,75 +76,90 @@
             </div>
         </div>
         <div id='term-window'>
-            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-            <div class='titles'>
-                {#if mounted}
-                    {#each [0, 1, 2] as title}
-                        <div class='title'>
-                            <Title 
-                                title={title} 
-                                enabled={titleReveal} 
-                                introover={titleIntroOver}
-                                outroend={(title == 2) ?
-                                    () => titleIntroOver = true :
-                                    () => void 0}
-                            />
+            <div></div>
+            <div class='flex'>
+                <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+                <div class='titles'>
+                    {#if mounted}
+                        {#each [0, 1, 2] as title}
+                            <div class='title'>
+                                <Title 
+                                    title={title} 
+                                    enabled={titleReveal} 
+                                    introover={titleIntroOver}
+                                    outroend={(title == 2) ?
+                                        () => titleIntroOver = true :
+                                        () => void 0}
+                                />
+                            </div>
+                        {/each}
+                        <div class='title main-title'
+                            in:blink|global={{ delay: 400 }}
+                            onintroend={() => (titleReveal = false)}
+                            onmouseover={() => { if (titleIntroOver) titleReveal = true  } } 
+                            onmouseout={ () => { if (titleIntroOver) titleReveal = false } } 
+                            role='none'
+                        >
+                            <h1>Apro</h1>
                         </div>
+                    {/if}
+                </div>
+                <p class='subtitle'>
+                    {#if (titleIntroOver && subtitleIn)}
+                        <span
+                            in:typewriter={{ delay: 100, speed: 200 }}
+                            out:typewriter={{ delay: 1500, backspace: true }}
+                            onintrostart={() => randomizeSubtitle() }
+                            onintroend={  () => subtitleIn = false }
+                            onoutroend={  () => subtitleIn = true  }
+                        >{subtitles[subtitleIndex]}</span>
+                    {/if}
+                &#8203;</p>
+                <div id='socials'>
+                    {#if titleIntroOver}
+                    {#each socials as social, i}
+                        <button class='social'
+                            transition:fly|global={{
+                                y: 50,
+                                delay: 500 + 200 * i,
+                                easing: backOut,
+                            }}
+                            onmouseover={() => hoveredSocial = i}
+                            onfocus={() => hoveredSocial = i}
+                            onmouseout={() => hoveredSocial = null}
+                            onblur={() => hoveredSocial = null}
+                            onmousedown={() => clickedSocial = true}
+                        >
+                            <Social name={social} hoverPos={(hoveredSocial === null) ? null : (i - hoveredSocial)} clicked={clickedSocial}/>
+                        </button>
                     {/each}
-                    <div class='title main-title'
-                        in:blink|global={{ delay: 400 }}
-                        onintroend={() => (titleReveal = false)}
-                        onmouseover={() => { if (titleIntroOver) titleReveal = true  } } 
-                        onmouseout={ () => { if (titleIntroOver) titleReveal = false } } 
-                        role='none'
-                    >
-                        <h1>Apro</h1>
-                    </div>
-                {/if}
-            </div>
-            <p class='subtitle'>
-                {#if (titleIntroOver && subtitleIn)}
-                    <span
-                        in:typewriter={{ delay: 100, speed: 200 }}
-                        out:typewriter={{ delay: 1500, backspace: true }}
-                        onintrostart={() => randomizeSubtitle() }
-                        onintroend={  () => subtitleIn = false }
-                        onoutroend={  () => subtitleIn = true  }
-                    >{subtitles[subtitleIndex]}</span>
-                {/if}
-            &#8203;</p>
-            <div id='socials'>
-                {#if titleIntroOver}
-                {#each socials as social, i}
-                    <button class='social'
-                        transition:fly|global={{
-                            y: 50,
-                            delay: 500 + 200 * i,
-                            easing: backOut,
-                        }}
-                        onmouseover={() => hoveredSocial = i}
-                        onfocus={() => hoveredSocial = i}
-                        onmouseout={() => hoveredSocial = null}
-                        onblur={() => hoveredSocial = null}
-                        onmousedown={() => clickedSocial = true}
-                    >
-                        <Social name={social} hoverPos={(hoveredSocial === null) ? null : (i - hoveredSocial)} clicked={clickedSocial}/>
-                    </button>
-                {/each}
-                {:else}
-                    <p>&#8203;</p>
-                {/if}
+                    {:else}
+                        <p>&#8203;</p>
+                    {/if}
+                </div>
             </div>
             <div class='prompt'>
                 <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
         </div>
-        <!-- <div class='tabs'>
-            <p onclick={() => selectedTab = 1} class={(selectedTab == 1 ? 'active' : '')}>1: Home</p>
-            <p onclick={() => selectedTab = 2} class={(selectedTab == 2 ? 'active' : '')}>2: About me</p>
-            <p onclick={() => selectedTab = 3} class={(selectedTab == 3 ? 'active' : '')}>3: Blog</p>
-            <p onclick={() => selectedTab = 4} class={(selectedTab == 4 ? 'active' : '')}>4: Projects</p>
-        </div> -->
+        <div class='tabs'>
+            <button onclick={() => selectedTab = 1} class={(selectedTab == 1 ? 'active' : '')}>
+                <p>1: Home</p>
+                <i class="fa-solid fa-house"></i>
+            </button>
+            <button onclick={() => selectedTab = 2} class={(selectedTab == 2 ? 'active' : '')}>
+                <p>2: About me</p>
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
+            <button onclick={() => selectedTab = 3} class={(selectedTab == 3 ? 'active' : '')}>
+                <p>3: Blog</p>
+                <i class="fa-solid fa-pen-nib"></i>
+            </button>
+            <button onclick={() => selectedTab = 4} class={(selectedTab == 4 ? 'active' : '')}>
+                <p>4: Projects</p>
+                <i class="fa-solid fa-gears"></i>
+            </button>
+        </div>
     </div>
 </main>
 
@@ -158,10 +173,26 @@
     #term-border {
         position: absolute;
         padding: 4px;
+        margin: 8px;
         border-radius: 12px;
         background-color: #67b0e8;
-        top:  calc(50vh - var(--termHeight) + var(--top));
-        left: calc(50vw - var(--termWidth)  + var(--left));
+
+        @media screen and (orientation:landscape) and (width > 1280px) {
+            top:  calc(50vh - var(--termHeight) + var(--top));
+            left: calc(50vw - var(--termWidth)  + var(--left));
+        }
+        @media screen and (orientation:portrait) {
+            left:  calc(50vw - var(--termWidth));
+            top:  calc(50vh - var(--termHeight));
+            width: min(1280px, calc(100% - 56px));
+            height: 60%;
+        }
+        @media screen and (orientation:landscape) and (width < 1280px) {
+            left:  calc(50vw - var(--termWidth));
+            top:  calc(50vh - var(--termHeight));
+            height: min(720px, calc(100% - 56px));
+            width: 70%;
+        }
     }
 
     #titlebar {
@@ -200,12 +231,39 @@
         background-color: #141b1e;
         border-radius: 8px;
         padding: 12px;
-        min-width: 35vw;
-        min-height: 45vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
+        justify-content: space-around;
+        align-items: stretch;
+        min-height: 45vh;
+        min-width: 35vw;
+        height: min(720px, calc(100% - 56px));
+        width: min(1280px, calc(100% - 24px));
+
+        // @media screen and (orientation:landscape) and (width > 1280px) {
+        // }
+        // @media screen and (orientation:portrait) {
+        //     width: calc(100% - 24px);
+        //     height: calc(100% - 56px);
+        // }
+        // @media screen and (orientation:landscape) and (width < 1280px) {
+        //     height: calc(100% - 56px);
+        // }
+
+        .flex {
+            flex-grow: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
+            @media screen and (orientation:landscape) {
+                justify-content: space-around;
+            }
+            @media screen and (orientation:portrait) {
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
     }
 
     .titles {
@@ -214,6 +272,9 @@
         color: #dadada;
         font-size: 4rem;
         text-align: center;
+        @media screen and (orientation:landscape) and (width < 1280px) {
+            margin-top: 2.5rem;
+        }
     }
 
     .title {
@@ -236,10 +297,12 @@
         margin-top: 1rem;
         margin-bottom: -1rem;
         font-size: 1.5rem;
+        text-align: center;
     }
 
     #socials {
-        width: 70%;
+        min-width: 70%;
+        max-width: 100%;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -247,9 +310,15 @@
         color: #b3b9b8;
         user-select: none;
         margin-top: 1rem;
-        margin-left: auto;
-        margin-right: auto;
+        margin-bottom: 2rem;
         height: 4rem;
+
+        @media screen and (height < 480px) { margin-top: 2rem; }
+
+        @media screen and (orientation:landscape) and (width > 1280px) {
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
     
     .social { 
@@ -257,7 +326,7 @@
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
-        line-height: 1em;
+        line-height: 0;
         font-size: 3rem;
         text-align: center;
         // height: 2em;
@@ -273,10 +342,12 @@
     }
 
     .prompt {
+
         font-family: 'Iosevka', monospace;
         font-size: 12pt;
         width: 100%;
         line-height: 0;
+        margin-top: auto;
 
         .ps1 { display: inline-block; }
         .pwd    { color: #c47fd5; }
@@ -288,19 +359,46 @@
         }
 
         .cursor {
-            animation: cursor-blink 1s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+            animation: cursor-blink 1s easeInOutExpo infinite;
             color: #dadada;
         }
+
+        @media screen and (height < 480px) { visibility: hidden; }
     }
 
-    // .tabs {
-    //     display: grid;
-    //     grid-template-columns: 25% 25% 25% 25%;
-    //     height: 100%;
-    //     * { height: 100%; }
+    .tabs {
+        display: flex;
+        height: 2rem;
+        margin-top: 4px;
+        gap: 4px;
+        justify-content: space-between;
+        border-radius: 8px;
+        
+        button { 
+            flex-grow: 1;
+            height: 100%;
+            margin-bottom: 6px;
+            padding: 0 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
 
-    //     .active {
-    //         background-color: #c47fd5;
-    //     }
-    // }
+                font-family: 'Iosevka', monospace;
+                font-size: 12pt;
+            i { text-align: end; }
+
+            &.active {
+                background-color: #c47fd5;
+                color: #141b1e;
+            }
+
+            &:not(&.active) {
+                color:#dadada;
+                background-color: #141b1e;
+            }
+        }
+
+    }
 </style>
