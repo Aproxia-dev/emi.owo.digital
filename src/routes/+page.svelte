@@ -1,9 +1,41 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import '@fortawesome/fontawesome-free/css/all.min.css';
+    import Title_0 from '$lib/assets/title-anim/title-0.svelte';
+    import Title_1 from '$lib/assets/title-anim/title-1.svelte';
+    import Title_2 from '$lib/assets/title-anim/title-2.svelte';
+
+    import { fade, fly } from 'svelte/transition';
+    import { backOut } from 'svelte/easing';
 
     import '../main.scss';
+    import '$lib/assets/no-overflow.scss';
 
+    let socials: string[] = [
+        "<p><i class='fa-brands fa-youtube'></i></p>",
+        "<p style='width:1em;height:1em;line-height:1em;text-align:center;border-radius:50%;color:#141b1e;background-color:#b3b9b8'>⁂</p>",
+        "<p><i class='fa-brands fa-github'></i></p>",
+        "<p><i class='fa-brands fa-discord'></i></p>",
+    ]
+
+
+    let top: number = $state(0);
+    let left: number = $state(0);
+
+    let grabbed: boolean = $state(false);
+
+    let fadeIn: boolean = $state(false);
+
+    function onmousedown() { grabbed = true; };
+    function onmouseup() { grabbed = false; };
+    function onmousemove(e: MouseEvent) {
+        if (grabbed) {
+            left += e.movementX;
+            top += e.movementY;
+        }
+    }
+
+    onMount(() => fadeIn = true);
 </script>
 
 <svelte:head>
@@ -11,9 +43,9 @@
     <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
 
-<div class='screen-center'>
-    <div class='term-border'>
-        <div class='titlebar'>
+<main>
+    <div class='term-border' style='--top: {top}px; --left: {left}px;'>
+        <div class='titlebar' {onmousedown} role='toolbar' aria-grabbed={grabbed} tabindex='0'>
             <span style='width:100px;'>
                 <i class="fa-solid fa-terminal"></i>
             </span>
@@ -25,38 +57,49 @@
             </div>
         </div>
         <div class='term-window'>
-            <div style='margin-top:4rem;margin-bottom:4rem;'>
-                {#each [...Array(4).keys()] as index}
-                    <h1 class='title title-{index}'>Apro</h1>
-                {/each}
+            <div class='titles'>
+                <div class='title title-0'><Title_0 /></div>
+                <div class='title title-1'><Title_1 /></div>
+                <div class='title title-2'><Title_2 /></div>
+                <div class='title title-3'><h1>Apro</h1></div>
             </div>
+            <p class='subtitle'>figuring out how to make this animated</p>
             <div class='socials'>
-                <p><i class="fa-brands fa-youtube"></i></p>
-                <div style='width:4rem;height:4rem;line-height:4rem;text-align:center;border-radius:50%;color:#141b1e;background-color:#dadada'>⁂</div>
-                <p><i class="fa-brands fa-github"></i></p>
-                <p><i class="fa-brands fa-discord"></i></p>
+                {#if fadeIn}
+                    {#each socials as social, i}
+                        <div style='flex-shrink:0;' transition:fly|global={{
+                            y: 50,
+                            delay: 1000 + 200 * i,
+                            easing: backOut,
+                        }}>
+                        {@html social}
+                        </div>
+                    {/each}
+                {:else}
+                    <p>&nbsp;</p>
+                {/if}
+            </div>
+            <div class='prompt'>
+                <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
         </div>
     </div>
-</div>
+</main>
+
+<svelte:window {onmouseup} {onmousemove} />
 
 <style lang="scss">
-    .screen-center {
-        position: fixed;
-        inset: 0;
-        width: fit-content;
-        height: fit-content;
-        margin: auto;
-    }
-
     .term-border {
+        position: absolute;
         padding: 4px;
-        // padding-top: 24px;
         border-radius: 12px;
         background-color: #67b0e8;
+        top: calc(27.5vh - 4px + var(--top));
+        left: calc(32.5vw - 4px + var(--left));
     }
 
     .titlebar {
+        cursor: move;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -64,6 +107,7 @@
         font-family: 'Iosevka';
         padding-right: 4px;
         padding-left: 8px;
+        user-select: none;
     }
 
     .term-buttons {
@@ -79,6 +123,7 @@
         height: 18px;
         aspect-ratio: 1;
         clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); 
+        cursor: pointer;
 
         &:hover {
             filter: brightness(70%) saturate(200%);
@@ -89,60 +134,101 @@
         background-color: #141b1e;
         border-radius: 8px;
         padding: 12px;
-        min-width: 40vw;
-        min-height: 45vh;
+        width: 35vw;
+        height: 45vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
     }
 
-    .socials {
-        width: 80%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        color: #dadada;
-        font-size: 4rem;
-    }
-
-    @keyframes blink {
+    @keyframes title-blink {
         0%   { visibility: hidden; }
         100%  { visibility: visible; }
     }
 
-    .title {
+    .titles {
+        margin-top: 4rem;
+        pointer-events: none;
         color: #dadada;
         font-size: 4rem;
-        line-height: 0;
         text-align: center;
-        visibility: hidden;
-        animation: blink 0.4s;
-        // position: absolute;
-        // top: 0;
-        // left: 0;
     }
 
+    .title {
+        visibility: hidden;
+        animation: title-blink 0.5s;
+        margin-top: -3rem;
+        margin-bottom: -3rem;
+    }
+
+    $title-delay: 0.2s;
+
     .title-0 {
-        transform: translate(0, -0.9rem);
-        font-family: "Pacifico";
-        animation-delay: 0.6s
+        animation-delay: $title-delay;
+        margin-bottom: -4rem;
     }
     .title-1 {
-        transform: translate(0, -0.6rem);
-        font-family: "Tiny5";
-        animation-delay: 0.7s
+        animation-delay: calc($title-delay + 0.1s);
     }
     .title-2 {
-        visibility: hidden;
-        transform: translate(0, -0.3rem);
-        font-family: "Asset";
-        animation-delay: 0.8s
+        animation-delay: calc($title-delay + 0.2s);
     }
     .title-3 {
         font-family: "Iosevka";
         animation-fill-mode: forwards;
-        animation-delay: 0.9s;
+        animation-delay: calc($title-delay + 0.3s);
+        pointer-events: fill;
+        h1 {
+            margin-top: -3rem;
+            font-size: 4rem;
+        }
+    }
+
+    .subtitle {
+        color: #dadada;
+        font-family: 'Iosevka', monospace;
+        margin-top: 2rem;
+        margin-bottom: -1rem;
+        font-size: 1.5rem;
+    }
+
+    .socials {
+        width: 70%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        color: #b3b9b8;
+        font-size: 3rem;
+        user-select: none;
+        line-height: 3rem;
+    }
+
+    @keyframes cursor-blink {
+        0%    { opacity: 0%;   }
+        50%   { opacity: 100%; }
+        100%  { opacity: 0%;   }
+    }
+
+    .prompt {
+        font-family: 'Iosevka', monospace;
+        font-size: 12pt;
+        width: 100%;
+        flex-shrink: 999;
+
+        .ps1 { display: inline-block; }
+        .pwd    { color: #c47fd5; }
+
+        .shell-symbol { 
+            color: #8ccf7e; 
+            margin-left: 0.5ch;
+            margin-right: 0.5ch;
+        }
+
+        .cursor {
+            animation: cursor-blink 1s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+            color: #dadada;
+        }
     }
 </style>
