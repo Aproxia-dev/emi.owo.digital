@@ -41,7 +41,6 @@
 
 <svelte:head>
     <title>your mom &lt;3</title>
-    <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
 <main>
     {#snippet termicon()}
