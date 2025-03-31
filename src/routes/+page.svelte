@@ -4,9 +4,10 @@
     import Social from '$lib/components/social.svelte';
 
     import { onMount } from 'svelte';
-    import { fly } from 'svelte/transition';
     import { blink, typewriter } from '$lib/transitions.svelte'
-    import { backOut } from 'svelte/easing';
+    import { backOut, quintOut } from 'svelte/easing';
+    import { Tween } from 'svelte/motion';
+    import { fly, slide } from 'svelte/transition';
     import { page } from '$app/state';
 
     import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -24,7 +25,37 @@
     let hoveredSocial: number | null = $state(null);
     let clickedSocial: boolean = $state(false);
     let selectedTab: number = $state(1);
-    // $inspect(hoveredSocial, 'hoveredSocial');
+    let hoveredTab: number = $state(0);
+    let closingTimeout: number;
+
+    let tabGliderPos = Tween.of(() => {
+        let ret: number = 0;
+        if (mounted) {
+            for (let i = 1; i < selectedTab; i++) {
+                ret += document.getElementById('tab-' + i)!.clientWidth + 4;
+            }
+        }
+        return ret;
+    }, {
+        duration: 400,
+        easing: quintOut
+    });
+
+
+    $inspect(tabGliderPos);
+
+    function changeTabHover(id: number) {
+        console.log("on tab " + id);
+        hoveredTab = id;
+        clearTimeout(closingTimeout!)
+    }
+
+    function leaveTabHover() {
+        closingTimeout = setTimeout(() => {
+            hoveredTab = 0;
+            console.log("closing all tab hovers");
+        }, 1)
+    }
 
     let term: HTMLElement = $state(undefined)!; 
 
@@ -44,7 +75,16 @@
             left += e.movementX;
             top += e.movementY;
         }
-    }
+    };
+
+    function padTime(i: number): string { return (i >= 10) ? `${i}` : `0${i}` }
+
+    let today = $state(new Date());
+    let h: string = $derived(padTime(((today.getHours() + 11) % 12) + 1));
+    let m: string = $derived(padTime(today.getMinutes()));
+    let p: string = $derived((today.getHours() <= 12) ? "AM" : "PM");
+
+    let clockTime = $derived(`${h}:${m} ${p}`);
 
     function onmouseup() {
         titlebarGrabbed = false;
@@ -56,6 +96,9 @@
         titleReveal = true;
 
         term = document.getElementById('term-border')!;
+
+        const clock = setInterval(() => { today = new Date(); }, 1000)
+        return () => clearInterval(clock);
     });
 </script>
 
@@ -63,8 +106,42 @@
     <title>your mom &lt;3</title>
     <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
-{#key page.url.pathname}
 <main transition:fly={{ y: -50 }}>
+    <div id='bar'>
+        <div>Logo</div>
+        <div class='workspaces'>
+            {#snippet tab(id: number, name: string)}
+            <button
+                onclick={    () => selectedTab = id} class={(selectedTab == id ? 'active' : '')}
+                onmouseover={() => changeTabHover(id)}
+                onfocus={    () => changeTabHover(id)}
+                onmouseout={ () => leaveTabHover()}
+                onblur={     () => leaveTabHover()}
+                id='tab-{id}'
+                style:anchor-name={`--tab-${id}`}
+            >
+                <p class='index' style:background-color={hoveredTab == id && hoveredTab != selectedTab ? '#404749' : 'transparent'} style:color={selectedTab == id ? '#0a1114' : '#dadada'}>{id}</p>
+                {#if selectedTab == id || hoveredTab == id}
+                    <p
+                        class='name'
+                        transition:slide={{
+                            axis: 'x',
+                            duration: 500,
+                            easing: quintOut
+                    }}>{name}</p>
+                {/if}
+            </button>
+            {/snippet}
+
+            {@render tab(1, 'Home')}
+            {@render tab(2, 'About Me')}
+            {@render tab(3, 'Blog')}
+            {@render tab(4, 'Projects')}
+            <span class='glider' style:position-anchor={`--tab-${selectedTab}`} style:--pos={`${tabGliderPos.current}px`}></span>
+        </div>
+        <div class='button'>{clockTime}</div>
+    </div>
+
     <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : 2147483647}px; --termWidth: {(term) ? term.offsetWidth / 2 : 2147483647}px;'>
         <div id='titlebar' onmousedown={grabTitlebar} role='none'>
             <span style='width:100px;'>
@@ -144,33 +221,106 @@
                 <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
         </div>
-        <div class='tabs'>
-            <button onclick={() => selectedTab = 1} class={(selectedTab == 1 ? 'active' : '')}>
-                <p>1: Home</p>
-                <i class="fa-solid fa-house"></i>
-            </button>
-            <button onclick={() => selectedTab = 2} class={(selectedTab == 2 ? 'active' : '')}>
-                <p>2: About me</p>
-                <i class="fa-solid fa-circle-info"></i>
-            </button>
-            <button onclick={() => selectedTab = 3} class={(selectedTab == 3 ? 'active' : '')}>
-                <p>3: Blog</p>
-                <i class="fa-solid fa-pen-nib"></i>
-            </button>
-            <button onclick={() => selectedTab = 4} class={(selectedTab == 4 ? 'active' : '')}>
-                <p>4: Projects</p>
-                <i class="fa-solid fa-gears"></i>
-            </button>
-        </div>
     </div>
 </main>
-{/key}
 
 <svelte:window {onmouseup} onmousemove={moveTitlebar} />
 
 <style lang="scss">
     button {
         all: unset;
+    }
+    
+    main { 
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
+    }
+
+    #bar {
+        width: 80%;
+        height: 1.5em;
+        margin: 8px auto;
+        padding: 4px 8px;
+        border: 2px solid #404749;
+        border-radius: 8px;
+        background-color: #141b1e;
+        color: #dadada;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        font-family: 'Iosevka', monospace;
+
+        .workspaces {
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 4px;
+            
+            button { 
+                border-radius: 8px;
+                background-color: #0a1114;
+                // border: 2px solid #404749;
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+                transition: background-color 0.2s easeOutSine;
+
+                &:hover, &:is(.active) { 
+                    background-color: #232a2d;
+                }
+                
+                p {
+                    all: unset;
+                    display: block;
+                    // z-index: 2;
+                    padding: 2px 4px;
+                    height: 100%;
+                    text-align: center;
+                    transition: background-color 0.2s easeOutSine;
+
+                    &.index {
+                        border-radius: 8px;
+                        width: calc(1.5em - 8px);
+                    }
+
+                    &.name {
+                        padding-left: 6px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+                }
+            }
+
+            span.glider {
+                position: absolute;
+                width: calc(1.5em);
+                height: calc(1.5em);
+                border-radius: 8px;
+                // left: var(--pos);
+                // top: 0;
+                z-index: 1;
+
+                transition: all 0.4s quintOut;
+                left: anchor(left);
+
+                background-color: #67b0e8;
+            }
+        }
+
+        div.button {
+            border-radius: 8px;
+            background-color: #0a1114;
+            padding: 4px;
+            cursor: default;
+
+            &:hover { background-color: #232a2d; }
+        }
     }
     
     #term-border {
@@ -184,12 +334,14 @@
             top:  calc(50vh - var(--termHeight) + var(--top));
             left: calc(50vw - var(--termWidth)  + var(--left));
         }
+
         @media screen and (orientation:portrait) {
             left:  calc(50vw - var(--termWidth));
             top:  calc(50vh - var(--termHeight));
             width: min(1280px, calc(100% - 56px));
             height: 60%;
         }
+
         @media screen and (orientation:landscape) and (width < 1280px) {
             left:  calc(50vw - var(--termWidth));
             top:  calc(50vh - var(--termHeight));
@@ -371,44 +523,43 @@
         @media screen and (height < 480px) { visibility: hidden; }
     }
 
-    .tabs {
-        display: flex;
-        // height: 2rem;
-        margin-top: 4px;
-        padding: 4px;
-        gap: 4px;
-        justify-content: space-between;
-        border-radius: 8px;
-        background-color: #141b1e;
+    // .tabs {
+    //     display: flex;
+    //     // height: 2rem;
+    //     margin-top: 4px;
+    //     padding: 4px;
+    //     gap: 4px;
+    //     justify-content: space-between;
+    //     border-radius: 8px;
+    //     background-color: #141b1e;
         
-        button { 
-            flex-grow: 1;
-            height: 100%;
-            padding: 0 8px;
-            border-radius: 4px;
-            // border-radius: 8px;
-            line-height: 0em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
+    //     button { 
+    //         flex-grow: 1;
+    //         height: 100%;
+    //         padding: 0 8px;
+    //         border-radius: 4px;
+    //         // border-radius: 8px;
+    //         line-height: 0em;
+    //         display: flex;
+    //         justify-content: space-between;
+    //         align-items: center;
+    //         text-align: center;
+    //         cursor: pointer;
 
-            font-family: 'Iosevka', monospace;
-            font-size: 12pt;
-            i { text-align: end; }
+    //         font-family: 'Iosevka', monospace;
+    //         font-size: 12pt;
+    //         i { text-align: end; }
 
-            &.active {
-                background-color: #c47fd5;
-                color: #141b1e;
-            }
+    //         &.active {
+    //             background-color: #c47fd5;
+    //             color: #141b1e;
+    //         }
 
-            &:not(&.active) {
-                color:#dadada;
-                background-color: #232a2d;
-                // background-color: #141b1e;
-            }
-        }
-
-    }
+    //         &:not(&.active) {
+    //             color:#dadada;
+    //             background-color: #232a2d;
+    //             // background-color: #141b1e;
+    //         }
+    //     }
+    // }
 </style>
