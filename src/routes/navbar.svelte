@@ -10,7 +10,7 @@
 
     let tabs: string[][] = [
         ['Home', '/'],
-        ['About Me', '/about-me'],
+        ['About Me', '/about-me?tab=desc'],
         ['Blog', '/blog'],
         ['Projects', '/projects'],
         /* 'fifth entry', 'sixth entry' */]

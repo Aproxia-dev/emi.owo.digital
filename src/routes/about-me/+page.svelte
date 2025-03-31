@@ -3,6 +3,8 @@
     import nameTitles from '$lib/assets/nameTitles.json';
 
     import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import { typewriter } from '$lib/transitions.svelte'
 
     import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -44,7 +46,6 @@
     }
 
     onMount(() => { randomizeNameTitle(); nameTitleIn = true; })
-
 </script>
 
 <main>
@@ -82,10 +83,15 @@
             </div>
             <div id='content'>
                 <div id='tabs'>
-
+                    {#each tabs as tab}
+                        <button onclick={() => goto(`?tab=${tab[1]}`)} class:active={page.url.searchParams.get('tab') === tab[1]}>
+                            {tab[0]}
+                        </button>
+                    {/each}
                 </div>
                 <div id='content-body'>
-
+                    <p>Content for tab: {page.url.searchParams.get('tab')}</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sem mauris, ultrices et molestie quis, interdum pharetra nulla. Aenean in dolor neque. Mauris eget tristique ante, ut facilisis purus. Suspendisse lobortis vestibulum pharetra. Donec nec placerat est. Fusce vitae lacus faucibus, placerat erat nec, convallis ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum dolor nunc, auctor viverra neque eget, vehicula efficitur ligula.</p>
                 </div>
             </div>
         </div>
@@ -103,18 +109,18 @@
         font-family: "Atkinson Hyperlegible";
 
         #header {
-            padding: 2rem 3rem;
+            padding: 2rem;
 
             display: flex;
             flex-direction: row;
             justify-content: center;
-            gap: 4ch;
+            gap: 2ch;
 
             img {
                 outline: #404749 solid 2px;
                 border-radius: 16px;
-                width: 128px;
-                height: 128px;
+                width: 160px;
+                height: 160px;
             }
             div {
                 h1 { margin: 0; }
@@ -125,26 +131,63 @@
                     word-wrap: break-word;
                 }
             }
+
+            #info-list {
+                padding-top: 0.5rem;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                gap: 1ch;
+
+                * {
+                    width: 100px;
+                    p { line-height: 0.7; }
+                }
+
+                #info-column-key {
+                    text-align: right;
+                    font-weight: bold;
+                }
+
+                #info-column-value {
+                    text-align: left;
+                }
+            }
         }
 
-        #info-list {
-            padding-top: 0.5rem;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 1ch;
-            
-            * {
-                width: 100px;
-                p { line-height: 0.7; }
+        #content {
+            max-width: 480px;
+
+            #tabs {
+                display: flex;
+
+                button {
+                    padding: 4px;
+                    margin-right: 4px;
+                    flex: 1;
+                    /* border-radius: 8px 8px 0 0; */
+                    border-radius: 8px;
+                    cursor: pointer;
+
+                    &.active {
+                        background-color: #c47fd5;
+                        /* background-color: #404749; */
+                        color: #232a2d;
+                    }
+                    &:not(.active) {
+                        /* background-color: #404749; */
+                        background-color: #232a2d;
+                    }
+                }
             }
 
-            #info-column-key {
-                text-align: right;
-                font-weight: bold;
-            }
-
-            #info-column-value {
+            #content-body {
+                /* outline:#c47fd5 solid 2px; */
+                /* background-color: #404749; */
+                border-radius: 4px;
+                background-color: #0a1114;
+                padding: 0.5rem 0.5rem;
+                margin-top: 8px;
                 text-align: left;
             }
         }
