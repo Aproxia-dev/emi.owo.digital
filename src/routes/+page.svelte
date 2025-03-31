@@ -1,18 +1,16 @@
 <script lang="ts">
+    import App from '$lib/components/app.svelte';
     import Title from '$lib/assets/title.svelte';
     import subtitles from '$lib/assets/subtitles.json';
     import Social from '$lib/components/social.svelte';
 
-    // import { onMount } from 'svelte';
     import { blink, typewriter } from '$lib/transitions.svelte'
     import { backOut } from 'svelte/easing';
     import { fly } from 'svelte/transition';
     import { afterNavigate } from '$app/navigation';
 
     import '@fortawesome/fontawesome-free/css/all.min.css';
-
     import '../main.scss';
-    import '$lib/assets/no-overflow.scss';
 
     let socials: string[] = ["YouTube", "Fediverse", "GitHub", "Discord"]
 
@@ -25,34 +23,13 @@
     let hoveredSocial: number | null = $state(null);
     let clickedSocial: boolean = $state(false);
 
-    let term: HTMLElement = $state(undefined)!; 
-
-    let top: number = $state(0);
-    let left: number = $state(0);
-
-    let titlebarGrabbed: boolean = $state(false);
-
     function randomizeSubtitle() {
         let newIndex: number = Math.floor(Math.random() * (subtitles.length - 1));
         subtitleIndex = newIndex < subtitleIndex ? newIndex : newIndex + 1;
     }
 
-    function grabTitlebar() { titlebarGrabbed = true; };
-    function moveTitlebar(e: MouseEvent) {
-        if (titlebarGrabbed) {
-            left += e.movementX;
-            top += e.movementY;
-        }
-    };
-
-    function onmouseup() {
-        titlebarGrabbed = false;
-        clickedSocial = false;
-    };
-
     afterNavigate(({ from }) => {
         mounted = true;
-        term = document.getElementById('term-border')!;
 
         animOn = (from === null);
         titleReveal = animOn;
@@ -67,19 +44,11 @@
     <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
 <main>
-    <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : 2147483647}px; --termWidth: {(term) ? term.offsetWidth / 2 : 2147483647}px;'>
-        <div id='titlebar' onmousedown={grabTitlebar} role='none'>
-            <span style='width:100px;'>
-                <i class="fa-solid fa-terminal"></i>
-            </span>
-            <p>Terminal</p>
-            <div class='term-buttons'>
-                <div class='term-button' style='background-color:#8ccf7e'></div>
-                <div class='term-button' style='background-color:#e5c76b'></div>
-                <div class='term-button' style='background-color:#e57474'></div>
-            </div>
-        </div>
-        <div id='term-window' style='--open:{mounted ? 2147483647 : 0}px'>
+    {#snippet termicon()}
+        <i class='fa-solid fa-terminal'></i>
+    {/snippet}
+    <App name={'Terminal'} icon={termicon}>
+        <div id='term'>
             <div></div>
             <div class='flex'>
                 <!-- svelte-ignore a11y_mouse_events_have_key_events -->
@@ -148,82 +117,11 @@
                 <p class='ps1'><span class='pwd'>/home/apro</span><span class='shell-symbol'>❤</span><span class='cursor'>_</span></p> 
             </div>
         </div>
-    </div>
+    </App>
 </main>
 
-<svelte:window {onmouseup} onmousemove={moveTitlebar} />
-
 <style lang="scss">
-    button { all: unset; }
-    
-    main { 
-        width: 100vw;
-        height: 100vh;
-        padding: 0;
-        margin: 0;
-    }
-
-    #term-border {
-        position: absolute;
-        padding: 4px;
-        margin: 8px;
-        border-radius: 12px;
-        z-index: 0;
-        background-color: #67b0e8;
-
-        @media screen and (orientation:landscape) and (width > 1280px) {
-            top:  calc(50vh - var(--termHeight) + var(--top));
-            left: calc(50vw - var(--termWidth)  + var(--left));
-        }
-
-        @media screen and (orientation:portrait) {
-            left:  calc(50vw - var(--termWidth));
-            top:  calc(50vh - var(--termHeight));
-            width: min(1280px, calc(100% - 56px));
-            height: 60%;
-        }
-
-        @media screen and (orientation:landscape) and (width < 1280px) {
-            left:  calc(50vw - var(--termWidth));
-            top:  calc(50vh - var(--termHeight));
-            height: min(720px, calc(100% - 56px));
-            width: 70%;
-        }
-    }
-
-    #titlebar {
-        cursor: move;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        line-height: 0px;
-        font-family: 'Iosevka';
-        padding-right: 4px;
-        padding-left: 8px;
-        user-select: none;
-    }
-
-    .term-buttons {
-        width: 100px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .term-button {
-        width: 18px;
-        height: 18px;
-        aspect-ratio: 1;
-        clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); 
-        cursor: pointer;
-
-        &:hover {
-            filter: brightness(70%) saturate(200%);
-        }
-    }
-
-    #term-window {
+    #term {
         background-color: #141b1e;
         border-radius: 8px;
         padding: 12px;
@@ -235,8 +133,6 @@
         min-width:  35vw;
         height: min(720px,  calc(100% - 56px));
         width:  min(1280px, calc(100% - 24px));
-
-        transition: height 1s easeOutCirc, width 1s easeOutCirc;
 
         // @media screen and (orientation:landscape) and (width > 1280px) {
         // }
@@ -363,44 +259,4 @@
 
         @media screen and (height < 480px) { visibility: hidden; }
     }
-
-    // .tabs {
-    //     display: flex;
-    //     // height: 2rem;
-    //     margin-top: 4px;
-    //     padding: 4px;
-    //     gap: 4px;
-    //     justify-content: space-between;
-    //     border-radius: 8px;
-    //     background-color: #141b1e;
-        
-    //     button { 
-    //         flex-grow: 1;
-    //         height: 100%;
-    //         padding: 0 8px;
-    //         border-radius: 4px;
-    //         // border-radius: 8px;
-    //         line-height: 0em;
-    //         display: flex;
-    //         justify-content: space-between;
-    //         align-items: center;
-    //         text-align: center;
-    //         cursor: pointer;
-
-    //         font-family: 'Iosevka', monospace;
-    //         font-size: 12pt;
-    //         i { text-align: end; }
-
-    //         &.active {
-    //             background-color: #c47fd5;
-    //             color: #141b1e;
-    //         }
-
-    //         &:not(&.active) {
-    //             color:#dadada;
-    //             background-color: #232a2d;
-    //             // background-color: #141b1e;
-    //         }
-    //     }
-    // }
 </style>

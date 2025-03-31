@@ -4,10 +4,12 @@
     import { Tween } from 'svelte/motion';
     import { slide } from 'svelte/transition';
 
+    import { page } from '$app/state';
+
     import '../main.scss';
 
     let tabs: string[][] = [
-        ['Home', '/#'],
+        ['Home', '/'],
         ['About Me', '/about-me'],
         ['Blog', '/blog'],
         ['Projects', '/projects'],
@@ -15,12 +17,18 @@
     let forceTabOpen: boolean = true;
 
     let mounted: boolean = $state(false);
-    let selectedTab: number = $state(1);
+    let selectedTab: number = $state(0);
     let hoveredTab: number = $state(0);
     let tabOpen: boolean[] = $state([])
     let tabSize: number[] = $state([])
     let touchscreen: boolean = $state(false);
     let closingTimeout: number;
+
+    for (let i = 0; i < tabs.length; i++) {
+        if (tabs[i][1] == page.url.pathname) {
+            selectedTab = i + 1
+        }
+    }
 
     if (forceTabOpen) for (let i = 0; i < tabs.length; i++) tabOpen[i] = true; 
 
@@ -68,7 +76,6 @@
 
     onMount(() => {
         mounted = true;
-
         getTabSizes();
 
         const clock = setInterval(() => { today = new Date(); }, 1000)
