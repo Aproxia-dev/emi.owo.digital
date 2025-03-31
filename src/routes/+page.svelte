@@ -177,7 +177,7 @@
     }
 
     .main-title {
-        font-family: "Iosevka";
+        font-family: "Iosevka Web";
         pointer-events: fill;
         h1 {
             margin-top: -3rem;
@@ -187,7 +187,7 @@
 
     .subtitle {
         color: #dadada;
-        font-family: 'Iosevka', monospace;
+        font-family: 'Iosevka Web', monospace;
         margin-top: 1rem;
         margin-bottom: -1rem;
         font-size: 1.5rem;
@@ -237,7 +237,7 @@
 
     .prompt {
 
-        font-family: 'Iosevka', monospace;
+        font-family: 'Iosevka Web', monospace;
         font-size: 12pt;
         width: 100%;
         line-height: 0;

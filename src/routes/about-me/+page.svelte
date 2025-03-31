@@ -119,7 +119,7 @@
             div {
                 h1 { margin: 0; }
                 p.nametitle {
-                    font-family: "Iosevka", monospace;
+                    font-family: "Iosevka Web", monospace;
                     margin: 0;
                     max-width:calc(200px + 1ch);
                     word-wrap: break-word;

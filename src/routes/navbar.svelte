@@ -144,7 +144,7 @@
         position: relative;
         border: 2px solid #232a2d;
         
-        font-family: 'Iosevka', monospace;
+        font-family: 'Iosevka Web', monospace;
 
         .workspaces {
             position: relative;
