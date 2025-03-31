@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import '@fortawesome/fontawesome-free/css/all.min.css';
     import Title from '$lib/assets/title.svelte';
+    import subtitles from '$lib/assets/subtitles.json';
     import Social from '$lib/components/social.svelte';
 
     import { fade, fly } from 'svelte/transition';
@@ -11,19 +12,16 @@
     import '../main.scss';
     import '$lib/assets/no-overflow.scss';
 
-    let socials: string[][] = [
-        ["<i class='fa-brands fa-youtube'></i>", "YouTube"],
-        ["⁂", "Fediverse"],
-        ["<i class='fa-brands fa-github'></i>", "GitHub"],
-        ["<i class='fa-brands fa-discord'></i>", "Discord"],
-    ] // ⁂
+    let socials: string[] = ["YouTube", "Fediverse", "GitHub", "Discord"]
 
-    let mounted: boolean = $state(false);
-    let titleanim: boolean = $state(false);
-    let titleanimOver: boolean = $state(false);
-    let selectedTab: number = $state(1);
+    let mounted: boolean        = $state(false);
+    let titleReveal: boolean    = $state(false)
+    let titleIntroOver: boolean = $state(false);
+    let subtitleIn: boolean     = $state(true);
+    let subtitleIndex: number = $state(0)
     let hoveredSocial: number | null = $state(null);
-
+    let clickedSocial: boolean = $state(false);
+    let selectedTab: number = $state(1);
     // $inspect(hoveredSocial, 'hoveredSocial');
 
     let term: HTMLElement = $state(undefined)!; 
@@ -31,20 +29,29 @@
     let top: number = $state(0);
     let left: number = $state(0);
 
-    let grabbed: boolean = $state(false);
+    let titlebarGrabbed: boolean = $state(false);
 
-    function onmousedown() { grabbed = true; };
-    function onmouseup() { grabbed = false; };
-    function onmousemove(e: MouseEvent) {
-        if (grabbed) {
+    function randomizeSubtitle() {
+        let newIndex: number = Math.floor(Math.random() * (subtitles.length - 1));
+        subtitleIndex = newIndex < subtitleIndex ? newIndex : newIndex + 1;
+    }
+
+    function grabTitlebar() { titlebarGrabbed = true; };
+    function moveTitlebar(e: MouseEvent) {
+        if (titlebarGrabbed) {
             left += e.movementX;
             top += e.movementY;
         }
     }
 
+    function onmouseup() {
+        titlebarGrabbed = false;
+        clickedSocial = false;
+    };
+
     onMount(() => {
         mounted = true;
-        titleanim = true;
+        titleReveal = true;
 
         term = document.getElementById('term-border')!;
     });
@@ -57,7 +64,7 @@
 
 <main>
     <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : Infinity}px; --termWidth: {(term) ? term.offsetWidth / 2 : Infinity}px; visibility: {mounted ? 'visible' : 'hidden'};'>
-        <div id='titlebar' {onmousedown} role='none'>
+        <div id='titlebar' onmousedown={grabTitlebar} role='none'>
             <span style='width:100px;'>
                 <i class="fa-solid fa-terminal"></i>
             </span>
@@ -69,53 +76,63 @@
             </div>
         </div>
         <div id='term-window'>
+            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             <div class='titles'>
                 {#if mounted}
                     {#each [0, 1, 2] as title}
                         <div class='title'>
                             <Title 
                                 title={title} 
-                                delay={100 + 100 * title} 
-                                enabled={titleanim} 
+                                enabled={titleReveal} 
+                                introover={titleIntroOver}
                                 outroend={(title == 2) ?
-                                    () => titleanimOver = true :
+                                    () => titleIntroOver = true :
                                     () => void 0}
-                                />
+                            />
                         </div>
                     {/each}
-                    <div class='title main-title' in:blink|global={{ delay: 400 }} onintroend={() => (titleanim = false)}><h1>Apro</h1></div>
+                    <div class='title main-title'
+                        in:blink|global={{ delay: 400 }}
+                        onintroend={() => (titleReveal = false)}
+                        onmouseover={() => { if (titleIntroOver) titleReveal = true  } } 
+                        onmouseout={ () => { if (titleIntroOver) titleReveal = false } } 
+                        role='none'
+                    >
+                        <h1>Apro</h1>
+                    </div>
                 {/if}
             </div>
             <p class='subtitle'>
-                &nbsp;
-                {#if (titleanimOver)}
+                {#if (titleIntroOver && subtitleIn)}
                     <span
-                        in:typewriter={{ speed: 200 }}
-                        out:typewriter={{ backspace: true }}
-                    >figuring out how to make this animated</span>
+                        in:typewriter={{ delay: 100, speed: 200 }}
+                        out:typewriter={{ delay: 1500, backspace: true }}
+                        onintrostart={() => randomizeSubtitle() }
+                        onintroend={  () => subtitleIn = false }
+                        onoutroend={  () => subtitleIn = true  }
+                    >{subtitles[subtitleIndex]}</span>
                 {/if}
-                &nbsp;
-            </p>
+            &#8203;</p>
             <div id='socials'>
-                {#if titleanimOver}
+                {#if titleIntroOver}
                 {#each socials as social, i}
-                    <div class='social'
+                    <button class='social'
                         transition:fly|global={{
                             y: 50,
                             delay: 500 + 200 * i,
                             easing: backOut,
                         }}
-                        role='tooltip'
                         onmouseover={() => hoveredSocial = i}
                         onfocus={() => hoveredSocial = i}
                         onmouseout={() => hoveredSocial = null}
                         onblur={() => hoveredSocial = null}
+                        onmousedown={() => clickedSocial = true}
                     >
-                        <Social icon={social[0]} name={social[1]} hoverId={(hoveredSocial === null) ? null : (i - hoveredSocial)}/>
-                </div>
+                        <Social name={social} hoverPos={(hoveredSocial === null) ? null : (i - hoveredSocial)} clicked={clickedSocial}/>
+                    </button>
                 {/each}
                 {:else}
-                    <p>&nbsp;</p>
+                    <p>&#8203;</p>
                 {/if}
             </div>
             <div class='prompt'>
@@ -131,9 +148,12 @@
     </div>
 </main>
 
-<svelte:window {onmouseup} {onmousemove} />
+<svelte:window {onmouseup} onmousemove={moveTitlebar} />
 
 <style lang="scss">
+    button {
+        all: unset;
+    }
     
     #term-border {
         position: absolute;
@@ -243,6 +263,7 @@
         // height: 2em;
         padding: 0 5%;
         width: 100%;
+        cursor: pointer;
     }
 
     @keyframes cursor-blink {
