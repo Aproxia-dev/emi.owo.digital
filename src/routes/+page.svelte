@@ -26,26 +26,34 @@
     let clickedSocial: boolean = $state(false);
     let selectedTab: number = $state(1);
     let hoveredTab: number = $state(0);
+    let tabOpen: boolean[] = $state([false, false, false, false])
+    let tabSize: number[] = $state([0, 0, 0, 0, 0])
+    let touchscreen: boolean = $state(false);
     let closingTimeout: number;
 
-    let tabGliderPos = Tween.of(() => {
+    let tabGlider = Tween.of(() => {
         let ret: number = 0;
         if (mounted) {
             for (let i = 1; i < selectedTab; i++) {
-                ret += document.getElementById('tab-' + i)!.clientWidth + 4;
+                ret += (tabOpen[i - 1] || touchscreen ? tabSize[i] : tabSize[0]) + 4
             }
         }
         return ret;
     }, {
-        duration: 400,
+        duration: 500,
         easing: quintOut
     });
 
+    function getTabSizes() {
+        touchscreen = window.matchMedia('(pointer: coarse)').matches;
 
-    $inspect(tabGliderPos);
+        tabSize[0] = document.getElementById('glider')!.clientWidth;
+        for (let i = 1; i <= 4; i++) {
+            tabSize[i] = document.getElementById(`tab-size-${i}`)!.clientWidth;
+        }
+    }
 
     function changeTabHover(id: number) {
-        console.log("on tab " + id);
         hoveredTab = id;
         clearTimeout(closingTimeout!)
     }
@@ -53,7 +61,6 @@
     function leaveTabHover() {
         closingTimeout = setTimeout(() => {
             hoveredTab = 0;
-            console.log("closing all tab hovers");
         }, 1)
     }
 
@@ -97,6 +104,8 @@
 
         term = document.getElementById('term-border')!;
 
+        getTabSizes();
+
         const clock = setInterval(() => { today = new Date(); }, 1000)
         return () => clearInterval(clock);
     });
@@ -111,6 +120,7 @@
         <div>Logo</div>
         <div class='workspaces'>
             {#snippet tab(id: number, name: string)}
+            <button style='visibility: hidden;position:absolute;' id='tab-size-{id}'><div class='index'>{id}</div><p class='name'>{name}</button>
             <button
                 onclick={    () => selectedTab = id} class={(selectedTab == id ? 'active' : '')}
                 onmouseover={() => changeTabHover(id)}
@@ -118,17 +128,22 @@
                 onmouseout={ () => leaveTabHover()}
                 onblur={     () => leaveTabHover()}
                 id='tab-{id}'
-                style:anchor-name={`--tab-${id}`}
             >
-                <p class='index' style:background-color={hoveredTab == id && hoveredTab != selectedTab ? '#404749' : 'transparent'} style:color={selectedTab == id ? '#0a1114' : '#dadada'}>{id}</p>
-                {#if selectedTab == id || hoveredTab == id}
+                <div class='index'>
+                    <div class='bg' style:background-color={hoveredTab == id ? '#404749' : 'transparent'}></div>
+                    <div class='id' style:color={selectedTab == id ? '#0a1114' : '#dadada'}>{id}</div>
+                </div>
+                {#if (selectedTab == id || hoveredTab == id) || touchscreen}
                     <p
                         class='name'
                         transition:slide={{
                             axis: 'x',
                             duration: 500,
                             easing: quintOut
-                    }}>{name}</p>
+                        }}
+                        onintrostart={() => tabOpen[id - 1] = true  }
+                        onoutrostart={() => tabOpen[id - 1] = false }
+                    >{name}</p>
                 {/if}
             </button>
             {/snippet}
@@ -137,7 +152,7 @@
             {@render tab(2, 'About Me')}
             {@render tab(3, 'Blog')}
             {@render tab(4, 'Projects')}
-            <span class='glider' style:position-anchor={`--tab-${selectedTab}`} style:--pos={`${tabGliderPos.current}px`}></span>
+            <span id='glider' style:--pos={`${tabGlider.current}px`}></span>
         </div>
         <div class='button'>{clockTime}</div>
     </div>
@@ -243,13 +258,15 @@
         height: 1.5em;
         margin: 8px auto;
         padding: 4px 8px;
-        border: 2px solid #404749;
         border-radius: 8px;
         background-color: #141b1e;
         color: #dadada;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        z-index: 1;
+        position: relative;
+        border: 2px solid #232a2d;
         
         font-family: 'Iosevka', monospace;
 
@@ -268,48 +285,66 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                user-select: none;
                 
                 transition: background-color 0.2s easeOutSine;
 
                 &:hover, &:is(.active) { 
                     background-color: #232a2d;
                 }
+
+                div.index {
+                    display: grid;
+                    grid-template: 1fr / 1fr;
+                    place-items: center;
+                    height: 100%;
+                    width: calc(1.5em);
+                    div {
+                        grid-column: 1 / 1;
+                        grid-row: 1 / 1;
+                        height: calc(100% - 8px);
+                        padding: 2px 4px;
+                        border-radius: 8px;
+                        width: calc(1.5em - 8px);
+                        text-align: center;
+                        transition: background-color 0.2s easeOutSine;
+
+                        &.id { z-index: 3; padding-bottom: 4px; transition: color 0.2s easeOutSine; }
+                    }
+                }
                 
                 p {
                     all: unset;
                     display: block;
-                    // z-index: 2;
                     padding: 2px 4px;
                     height: 100%;
                     text-align: center;
                     transition: background-color 0.2s easeOutSine;
 
-                    &.index {
-                        border-radius: 8px;
-                        width: calc(1.5em - 8px);
-                    }
 
                     &.name {
-                        padding-left: 6px;
+                        margin-left: 6px;
                         white-space: nowrap;
                         overflow: hidden;
                     }
                 }
             }
 
-            span.glider {
+            span#glider {
                 position: absolute;
                 width: calc(1.5em);
                 height: calc(1.5em);
                 border-radius: 8px;
-                // left: var(--pos);
+                left: var(--pos);
                 // top: 0;
-                z-index: 1;
+                pointer-events: none;
+                z-index: 2;
 
                 transition: all 0.4s quintOut;
-                left: anchor(left);
+                // left: anchor(left);
 
                 background-color: #67b0e8;
+                // background-color: none;
             }
         }
 
@@ -318,6 +353,7 @@
             background-color: #0a1114;
             padding: 4px;
             cursor: default;
+            white-space: nowrap;
 
             &:hover { background-color: #232a2d; }
         }
@@ -328,6 +364,7 @@
         padding: 4px;
         margin: 8px;
         border-radius: 12px;
+        z-index: 0;
         background-color: #67b0e8;
 
         @media screen and (orientation:landscape) and (width > 1280px) {
