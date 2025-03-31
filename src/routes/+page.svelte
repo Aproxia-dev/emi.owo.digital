@@ -1,13 +1,15 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import '@fortawesome/fontawesome-free/css/all.min.css';
     import Title from '$lib/assets/title.svelte';
     import subtitles from '$lib/assets/subtitles.json';
     import Social from '$lib/components/social.svelte';
 
-    import { fade, fly } from 'svelte/transition';
+    import { onMount } from 'svelte';
+    import { fly } from 'svelte/transition';
     import { blink, typewriter } from '$lib/transitions.svelte'
     import { backOut } from 'svelte/easing';
+    import { page } from '$app/state';
+
+    import '@fortawesome/fontawesome-free/css/all.min.css';
 
     import '../main.scss';
     import '$lib/assets/no-overflow.scss';
@@ -61,9 +63,9 @@
     <title>your mom &lt;3</title>
     <link href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css" rel="stylesheet" />
 </svelte:head>
-
-<main>
-    <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : Infinity}px; --termWidth: {(term) ? term.offsetWidth / 2 : Infinity}px; visibility: {mounted ? 'visible' : 'hidden'};'>
+{#key page.url.pathname}
+<main transition:fly={{ y: -50 }}>
+    <div id='term-border' style='--top: {top}px; --left: {left}px; --termHeight: {(term) ? term.offsetHeight / 2 : 2147483647}px; --termWidth: {(term) ? term.offsetWidth / 2 : 2147483647}px;'>
         <div id='titlebar' onmousedown={grabTitlebar} role='none'>
             <span style='width:100px;'>
                 <i class="fa-solid fa-terminal"></i>
@@ -75,7 +77,7 @@
                 <div class='term-button' style='background-color:#e57474'></div>
             </div>
         </div>
-        <div id='term-window'>
+        <div id='term-window' style='--open:{mounted ? 2147483647 : 0}px'>
             <div></div>
             <div class='flex'>
                 <!-- svelte-ignore a11y_mouse_events_have_key_events -->
@@ -162,6 +164,7 @@
         </div>
     </div>
 </main>
+{/key}
 
 <svelte:window {onmouseup} onmousemove={moveTitlebar} />
 
@@ -236,9 +239,11 @@
         justify-content: space-around;
         align-items: stretch;
         min-height: 45vh;
-        min-width: 35vw;
-        height: min(720px, calc(100% - 56px));
-        width: min(1280px, calc(100% - 24px));
+        min-width:  35vw;
+        height: min(720px,  calc(100% - 56px));
+        width:  min(1280px, calc(100% - 24px));
+
+        transition: height 1s easeOutCirc, width 1s easeOutCirc;
 
         // @media screen and (orientation:landscape) and (width > 1280px) {
         // }
@@ -368,25 +373,29 @@
 
     .tabs {
         display: flex;
-        height: 2rem;
+        // height: 2rem;
         margin-top: 4px;
+        padding: 4px;
         gap: 4px;
         justify-content: space-between;
         border-radius: 8px;
+        background-color: #141b1e;
         
         button { 
             flex-grow: 1;
             height: 100%;
-            margin-bottom: 6px;
             padding: 0 8px;
-            border-radius: 8px;
+            border-radius: 4px;
+            // border-radius: 8px;
+            line-height: 0em;
             display: flex;
             justify-content: space-between;
             align-items: center;
             text-align: center;
+            cursor: pointer;
 
-                font-family: 'Iosevka', monospace;
-                font-size: 12pt;
+            font-family: 'Iosevka', monospace;
+            font-size: 12pt;
             i { text-align: end; }
 
             &.active {
@@ -396,7 +405,8 @@
 
             &:not(&.active) {
                 color:#dadada;
-                background-color: #141b1e;
+                background-color: #232a2d;
+                // background-color: #141b1e;
             }
         }
 

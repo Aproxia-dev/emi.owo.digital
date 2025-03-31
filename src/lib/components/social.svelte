@@ -1,14 +1,13 @@
 <script lang="ts">
-    import { fly } from 'svelte/transition';
-    import SocialIcon from '$lib/assets/social-icons-outline.svelte';
-    // import SocialIcon from '$lib/assets/social-icons-filled.svelte';
-    // import SocialIcon from '$lib/assets/social-icons-basic.svelte';
+    import SocialIcon from '$lib/assets/social-icons-outline.svelte'; // Obrysy
+    // import SocialIcon from '$lib/assets/social-icons-filled.svelte';  // Bublinky
+    // import SocialIcon from '$lib/assets/social-icons-basic.svelte';   // Obycejny
     let { name, hoverPos, clicked } = $props();
 
     // $inspect(hoverPos, clicked, name)
 </script>
 
-    <div style='--translate: {hoverPos ? 2 >= hoverPos && hoverPos >= -2 ? 3 / hoverPos : 0 : 0}rem; --scale: {(hoverPos == 0 ? 180 : (5 - Math.abs(hoverPos) + 1) * 20)}%;'>
+<div style='--translate: {hoverPos ? 2 >= hoverPos && hoverPos >= -2 ? 3 / hoverPos : 0 : 0}rem; --scale: {(hoverPos == 0 ? 180 : (5 - Math.abs(hoverPos) + 1) * 20)}%;'>
     <p class='icon' style='opacity:{(5-Math.abs(hoverPos))*20}%;transform: scale({hoverPos === 0 && clicked ? 70 : 100}%)'>
         <SocialIcon name={name} />
     </p>
