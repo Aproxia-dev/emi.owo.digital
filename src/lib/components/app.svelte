@@ -6,12 +6,10 @@
     let app: {
         top: number
         left: number
-        source: HTMLElement
         grabbed: boolean
     } = $state({
         top: 0,
         left: 0,
-        source: undefined!,
         grabbed: false,
     })
 
@@ -24,11 +22,9 @@
     }
 
     function onmouseup() { app.grabbed = false; }
-
-    onMount(() => { app.source = document.getElementById('app')! })
 </script>
 
-<div id='app' style='--top: {app.top}px; --left: {app.left}px; --height: {(app.source) ? app.source.offsetHeight / 2 : 2147483647}px; --width: {(app.source) ? app.source.offsetWidth / 2 : 2147483647}px;'>
+<div id='app' style='--top:{app.top}px; --left:{app.left}px;'>
     <div id='titlebar' onmousedown={grabTitlebar} role='none'>
         <span style='width:100px;'>
             {@render icon()}
@@ -53,9 +49,10 @@
         border-radius: 12px;
         z-index: 0;
         background-color: #67b0e8;
+        transform: translate(-50%, -50%);
 
-        top:  calc(50vh - var(--height) + var(--top));
-        left: calc(50vw - var(--width)  + var(--left));
+        top:  calc(50vh + var(--top));
+        left: calc(50vw + var(--left));
     }
 
     #titlebar {
