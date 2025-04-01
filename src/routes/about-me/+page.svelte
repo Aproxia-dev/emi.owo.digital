@@ -122,7 +122,7 @@
                                 <!-- [TODO] add images -->
                                  <div class='skills'>
                                 {#each skills as skill, i}
-                                    <div>
+                                    <div class='slident'>
                                         <img src={skill[0]} alt={skill[1]}>
                                         <p>{skill[1]}</p>
                                     </div>
@@ -133,7 +133,7 @@
                                 <p><sub>i really don't feel like writing this rn</sub></p>
                             {:else if page.url.searchParams.get('tab') === 'social'}
                                 <p>ghhhhhhh</p>
-                                <ul>
+                                <ul class='slident'>
                                     <li><a href='https://www.youtube.com/channel/UCk1zcHlOko3j4UcJh-0WWig'>Youtube</a></li>
                                     <li><a href='https://social.owo.digital/@emily'>Fediverse</a></li>
                                     <li><a href='https://github.com/Aproxia-dev'>GitHub</a></li>
