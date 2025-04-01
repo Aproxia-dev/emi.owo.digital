@@ -85,7 +85,7 @@
                             onintrostart={() => randomizeSubtitle() }
                             onintroend={  () => subtitleIn = false }
                             onoutroend={  () => subtitleIn = true  }
-                        >{subtitles[subtitleIndex]}&#8203;</span>
+                        >{subtitles[subtitleIndex]}</span>&#8203;
                     {/if}
                 </p>
                 <div id='socials'>
