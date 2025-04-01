@@ -1,11 +1,11 @@
 <script lang="ts">
-    import Navbar from './navbar.svelte';
-    import '../main.scss';
+    import Navbar from "./navbar.svelte";
+    import "../main.scss";
 
     let { children } = $props();
 </script>
 
-<div class='site'>
+<div class="site">
     <Navbar />
 
     <main>

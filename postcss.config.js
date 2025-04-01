@@ -1,6 +1,6 @@
 export default {
     plugins: {
-      'postcss-easings': {'easings': {}},
-      'autoprefixer': {},
+        "postcss-easings": { easings: {} },
+        autoprefixer: {},
     },
-  }
+};
