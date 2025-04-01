@@ -21,7 +21,6 @@
         }
     }
 
-    :global(div#slide-enter > *),
     :global(div#slide-enter *:not(.slident *)) {
         --step: 0;
         animation-name: slide-enter;
