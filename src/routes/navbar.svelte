@@ -25,7 +25,7 @@
     let closingTimeout: number;
 
     for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i][1] == page.url.pathname) {
+        if (tabs[i][1].split('?')[0] == page.url.pathname) {
             selectedTab = i + 1
         }
     }
