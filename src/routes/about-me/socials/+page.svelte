@@ -9,23 +9,32 @@
         duration="400"
         distance="10"
     >
-        <p>
-            Heyo! My name's Emi, but I usually go by
-            Aproxia. Welcome to my cozy little spot
-            on the internet!
-        </p>
-        <p>
-            I'm a self-taught software dev,
-            designer, sysadmin and artist who's
-            simply just excited to make things!
-        </p>
-        <p>
-            I am non-binary and use
-            <a href="https://en.pronouns.page/@Aproxia">
-                they/she/it/vi pronouns
-            </a>, and consider myself a voidpunk fox
-            therian.
-        </p>
+            <p>ghhhhhhh</p>
+            <ul class="slident">
+                <li>
+                    <a
+                        href="https://www.youtube.com/channel/UCk1zcHlOko3j4UcJh-0WWig"
+                        >Youtube</a
+                    >
+                </li>
+                <li>
+                    <a
+                        href="https://social.owo.digital/@emily"
+                        >Fediverse</a
+                    >
+                </li>
+                <li>
+                    <a
+                        href="https://github.com/Aproxia-dev"
+                        >GitHub</a
+                    >
+                </li>
+                <li>Discord: mkshift</li>
+            </ul>
+            <p>
+                i don't wanna bother with this right now
+                fuck off
+            </p>
     </SlideIn>
 </main>
 
@@ -63,6 +72,16 @@
 
         &:hover::after {
             transform: scaleX(100%);
+        }
+    }
+
+
+    ul {
+        margin: 0;
+        padding: 0.5rem;
+        padding-left: 1rem;
+        li {
+            list-style-type: none;
         }
     }
 </style>
