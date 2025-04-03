@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
 
     let { name, icon, children } = $props();
+    let mounted: boolean = $state(false);
 
     let app: {
         top: number;
@@ -26,9 +27,14 @@
     function onmouseup() {
         app.grabbed = false;
     }
+
+    onMount (() => {
+        mounted = true;
+        app.top = ( window.innerHeight - document.getElementById("app")!.offsetHeight ) / 2;
+    });
 </script>
 
-<div id="app" style="--top:{app.top}px; --left:{app.left}px;">
+<div id="app" style="--top:{app.top}px; --left:{app.left}px; visibility:{mounted ? "visible" : "hidden"}">
     <div id="titlebar" onmousedown={grabTitlebar} role="none">
         <span style="width:100px;">
             {@render icon()}
@@ -53,9 +59,9 @@
         border-radius: 12px;
         z-index: 0;
         background-color: #67b0e8;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, 0);
 
-        top: calc(50vh + var(--top));
+        top: var(--top);
         left: calc(50vw + var(--left));
     }
 
