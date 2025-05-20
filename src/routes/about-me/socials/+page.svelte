@@ -12,22 +12,13 @@
             <p>ghhhhhhh</p>
             <ul class="slident">
                 <li>
-                    <a
-                        href="https://www.youtube.com/channel/UCk1zcHlOko3j4UcJh-0WWig"
-                        >Youtube</a
-                    >
+                    <a href="https://www.youtube.com/channel/UCk1zcHlOko3j4UcJh-0WWig">Youtube</a>
                 </li>
                 <li>
-                    <a
-                        href="https://social.owo.digital/@emily"
-                        >Fediverse</a
-                    >
+                    <a href="https://social.owo.digital/@emily">Fediverse</a>
                 </li>
                 <li>
-                    <a
-                        href="https://github.com/Aproxia-dev"
-                        >GitHub</a
-                    >
+                    <a href="https://github.com/Aproxia-dev" >GitHub</a>
                 </li>
                 <li>Discord: mkshift</li>
             </ul>
