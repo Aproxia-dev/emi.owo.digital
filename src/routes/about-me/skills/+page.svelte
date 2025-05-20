@@ -20,7 +20,6 @@
         duration="400"
         distance="10"
     >
-        <!-- [TODO] add images -->
         <div class="skills">
             {#each skills as skill}
                 <div class="slident">
