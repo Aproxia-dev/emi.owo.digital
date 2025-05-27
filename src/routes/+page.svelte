@@ -138,6 +138,8 @@
     </App>
 </main>
 
+<svelte:window onmouseup={() => clickedSocial = false } />
+
 <style lang="scss">
     #term {
         background-color: #141b1e;
