@@ -1,13 +1,12 @@
 <script lang="ts">
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
 	onMount(() => {
-		const rootEl = document.documentElement;
+		let rootEl = document.documentElement;
 		rootEl.classList.add('jsenabled');
 	});
 </script>

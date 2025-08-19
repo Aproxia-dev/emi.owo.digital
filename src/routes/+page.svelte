@@ -13,10 +13,11 @@
 	import DiscordIcon from '$lib/assets/socials/outline/discord.svelte';
 
 	import { Terminal } from '@lucide/svelte';
+	import type { Component } from 'svelte';
 
 	let titles = [Title0, Title1, Title2];
 
-	let socials: { name: string; icon: string; href: string }[] = [
+	let socials: { name: string; icon: Component; href: string }[] = [
 		{ name: 'YouTube', icon: YoutubeIcon, href: 'https://www.youtube.com/@howaretheygameing' },
 		{ name: 'Fediverse', icon: FediverseIcon, href: 'https://social.owo.digital/@emily' },
 		{ name: 'GitHub', icon: GithubIcon, href: 'https://github.com/Aproxia-dev' },
@@ -28,7 +29,7 @@
 	<Terminal />
 {/snippet}
 
-<Window name="Terminal" {icon}>
+<Window name="Terminal" {icon} defaultPos={{ top: '50%', left: '50%' }}>
 	<div
 		class="flex size-full flex-col items-center justify-center rounded-lg bg-bg px-8 pt-4 pb-24 text-fg"
 	>
@@ -90,9 +91,12 @@
 			style:--cols={`repeat(${socials.length}, minmax(0, 1fr))`}
 			class="group/socials mt-4 grid w-[30vw] grid-cols-(--cols) px-8"
 		>
-			{#each socials as { name, icon: Icon, href }, _ (name)}
+			{#each socials as { name, icon: Icon, href }, i (name)}
 				<a {href} target="_blank" class="focus:outline-0">
-					<div class="relative flex items-center justify-center">
+					<div
+						style:--delay={`${(titles.length * 2 + 1) * 250 + (i + 1) * 200}ms`}
+						class="relative flex animate-[slide-in_500ms_linear_var(--delay)_forwards] animation-ease-out-back items-center justify-center opacity-0"
+					>
 						<span><Icon alt={name} class="size-12 text-center" /></span>
 						<p class="absolute top-[70%] left-[50%] -translate-x-1/2">
 							{name}
@@ -137,6 +141,9 @@
 						a:nth-child(#{$j}) div {
 							span {
 								transform: scale(150%);
+								&:active {
+									transform: scale(120%);
+								}
 							}
 							p {
 								opacity: 100%;

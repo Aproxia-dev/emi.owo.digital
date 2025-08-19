@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@plugin 'tailwindcss-easing';
 
 /* atkinson-hyperlegible-latin-400-normal */
 @font-face {
@@ -49,6 +50,17 @@
 	50%,
 	100% {
 		visibility: visible;
+	}
+}
+
+@keyframes slide-in {
+	0% {
+		opacity: 0%;
+		transform: translateY(3rem);
+	}
+	100% {
+		opacity: 100%;
+		transform: translateY(0);
 	}
 }
 

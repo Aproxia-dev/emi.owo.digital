@@ -1,5 +1,27 @@
 <script lang="ts">
-	let { name, icon, class: className, children } = $props();
+	import { onMount, type Snippet } from 'svelte';
+	import { browser } from '$app/environment';
+	import type { Warning } from 'svelte/types/compiler/interfaces';
+
+	let {
+		name,
+		icon,
+		class: className = '',
+		defaultPos = {
+			top: '0px',
+			left: '0px'
+		},
+		children
+	}: {
+		name: string;
+		icon: Snippet;
+		class: string;
+		defaultPos: {
+			top: string;
+			left: string;
+		};
+		children: Snippet;
+	} = $props();
 
 	let app: {
 		top: number;
@@ -13,29 +35,43 @@
 
 	function onmousedown() {
 		app.grabbed = true;
+		rootEl?.classList.add('cursor-grabbing');
 	}
 
 	function onmouseup() {
 		app.grabbed = false;
+		rootEl?.classList.remove('cursor-grabbing');
 	}
 
 	function onmousemove(e: MouseEvent) {
 		if (app.grabbed) {
-			app.left += e.movementX;
-			app.top += e.movementY;
+			requestAnimationFrame(() => {
+				app.left += e.movementX;
+				app.top += e.movementY;
+			});
 		}
 	}
+
+	let window: HTMLDivElement | undefined = $state(undefined);
+	let rootEl = browser ? document.documentElement : undefined;
+	let mounted: boolean = $state(false);
+
+	onMount(() => {
+		mounted = true;
+		app.top = -window!.offsetHeight / 2;
+	});
 </script>
 
 <div
-	class="absolute top-(--top) left-(--left) z-0 m-2 rounded-xl bg-accent p-1"
-	style:--top={`${app.top}px`}
-	style:--left={`${app.left}px`}
+	class={`absolute top-(--top) left-(--left) z-0 m-2 rounded-xl bg-accent p-1 ${mounted ? '-translate-x-1/2' : '-translate-1/2'} ${className}`}
+	style:--top={`calc(${defaultPos.top} + ${app.top}px)`}
+	style:--left={`calc(${defaultPos.left} + ${app.left}px)`}
+	bind:this={window}
 >
 	<div
 		{onmousedown}
 		role="presentation"
-		class="grid w-full grid-cols-3 items-center justify-self-center p-1 pt-0"
+		class="grid w-full grid-cols-3 items-center justify-self-center p-1 pt-0 select-none"
 	>
 		<div>
 			{@render icon()}
