@@ -20,6 +20,24 @@
 @theme {
 	--font-sans: 'Atkinson Hyperlegible', sans-serif;
 	--font-mono: 'Iosevka Fixed SS14 Web', monospace;
+
+	--color-bg: #141b1e;
+	--color-fg: #dadada;
+	--color-dbg: #0a1114;
+	--color-lbg: #232a2d;
+	--color-mbg: #404749;
+	--color-mfg: #b3b9b8;
+
+	--color-accent: #67b0e8;
+
+	--color-black: #0a1114;
+	--color-red: #e57474;
+	--color-green: #8ccf7e;
+	--color-yellow: #e5c76b;
+	--color-blue: #67b0e8;
+	--color-magenta: #c47fd5;
+	--color-cyan: #6cbfbf;
+	--color-white: #dadada;
 }
 
 @custom-variant noscript (&:not(.jsenabled *));
