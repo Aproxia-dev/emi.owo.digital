@@ -6,6 +6,7 @@
 	let {
 		name,
 		icon,
+		maximized = $bindable(false),
 		class: className = '',
 		defaultPos = {
 			top: '0px',
@@ -15,6 +16,7 @@
 	}: {
 		name: string;
 		icon: Snippet;
+		maximized: boolean;
 		class: string;
 		defaultPos: {
 			top: string;
@@ -34,8 +36,10 @@
 	});
 
 	function onmousedown() {
-		app.grabbed = true;
-		rootEl?.classList.add('cursor-grabbing');
+		if (!maximized) {
+			app.grabbed = true;
+			rootEl?.classList.add('cursor-grabbing');
+		}
 	}
 
 	function onmouseup() {
@@ -63,7 +67,7 @@
 </script>
 
 <div
-	class={`absolute top-(--top) left-(--left) z-0 m-2 rounded-xl bg-accent p-1 ${mounted ? '-translate-x-1/2' : '-translate-1/2'} ${className}`}
+	class={`absolute top-(--top) left-(--left) z-0 rounded-xl bg-accent p-1 ${mounted ? '-translate-x-1/2' : '-translate-1/2'} ${maximized ? '!top-12 !left-1/2 h-[calc(100vh-3.5rem)] w-[calc(100vw-1rem)]' : 'size-fit'} ${className}`}
 	style:--top={`calc(${defaultPos.top} + ${app.top}px)`}
 	style:--left={`calc(${defaultPos.left} + ${app.left}px)`}
 	bind:this={window}
@@ -71,16 +75,19 @@
 	<div
 		{onmousedown}
 		role="presentation"
-		class="grid w-full grid-cols-3 items-center justify-self-center p-1 pt-0 select-none"
+		class="grid h-7 w-full grid-cols-3 items-center justify-self-center px-1 select-none"
 	>
 		<div>
 			{@render icon()}
 		</div>
 		<p class="text-center">{name}</p>
 		<div class="flex flex-row items-center justify-end gap-1">
-			<div class="diamond size-4 bg-green"></div>
-			<div class="diamond size-4 bg-yellow"></div>
-			<div class="diamond size-4 bg-red"></div>
+			<button
+				class="diamond size-4 bg-green hover:cursor-pointer hover:brightness-80"
+				onclick={() => (maximized = !maximized)}
+			></button>
+			<button class="diamond size-4 bg-yellow hover:cursor-pointer hover:brightness-80"></button>
+			<button class="diamond size-4 bg-red hover:cursor-pointer hover:brightness-80"></button>
 		</div>
 	</div>
 	{@render children()}

@@ -23,15 +23,17 @@
 		{ name: 'GitHub', icon: GithubIcon, href: 'https://github.com/Aproxia-dev' },
 		{ name: 'Discord', icon: DiscordIcon, href: 'https://youtube.com/watch?v=dQw4w9WgXcQ' }
 	];
+
+	let maximized = $state(false);
 </script>
 
 {#snippet icon()}
 	<Terminal />
 {/snippet}
 
-<Window name="Terminal" {icon} defaultPos={{ top: '50%', left: '50%' }}>
+<Window name="Terminal" {icon} defaultPos={{ top: '50%', left: '50%' }} bind:maximized>
 	<div
-		class="flex size-full flex-col items-center justify-center rounded-lg bg-bg px-8 pt-4 pb-24 text-fg"
+		class="flex h-[calc(100%-1.75rem)] flex-col items-center justify-center rounded-lg bg-bg px-8 pt-4 pb-24 text-fg"
 	>
 		<div class="group/title-stack flex flex-col items-center justify-center">
 			{#each titles as Title, i (i)}
@@ -89,13 +91,13 @@
 
 		<div
 			style:--cols={`repeat(${socials.length}, minmax(0, 1fr))`}
-			class="group/socials mt-4 grid w-[30vw] grid-cols-(--cols) px-8"
+			class="group/socials mt-4 grid w-112 grid-cols-(--cols) px-8"
 		>
 			{#each socials as { name, icon: Icon, href }, i (name)}
 				<a {href} target="_blank" class="focus:outline-0">
 					<div
 						style:--delay={`${(titles.length * 2 + 1) * 250 + (i + 1) * 200}ms`}
-						class="relative flex animate-[slide-in_500ms_linear_var(--delay)_forwards] animation-ease-out-back items-center justify-center opacity-0"
+						class="relative flex w-24 animate-[slide-in_500ms_linear_var(--delay)_forwards] items-center justify-center opacity-0 animation-ease-out-back"
 					>
 						<span><Icon alt={name} class="size-12 text-center" /></span>
 						<p class="absolute top-[70%] left-[50%] -translate-x-1/2">
@@ -151,12 +153,10 @@
 							}
 						}
 					} @else {
-						a:nth-child(#{$j}) div {
-							transform: translateX(math.div(2.5rem, -$diff));
-							span {
-								opacity: 100% - $absDiff * 20%;
-								transform: scale(clamp(20%, 100% - (#{$absDiff} - 1) * 20%, 100%));
-							}
+						a:nth-child(#{$j}) div span {
+							opacity: 100% - $absDiff * 20%;
+							transform: scale(clamp(20%, 100% - (#{$absDiff} - 1) * 20%, 100%))
+								translateX(math.div(2rem, -$diff));
 						}
 					}
 				}
