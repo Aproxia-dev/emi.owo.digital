@@ -12,7 +12,7 @@
 	import GithubIcon from '$lib/assets/socials/outline/github.svelte';
 	import DiscordIcon from '$lib/assets/socials/outline/discord.svelte';
 
-	import { Terminal } from '@lucide/svelte';
+	import { Terminal, Heart } from '@lucide/svelte';
 	import type { Component } from 'svelte';
 
 	let titles = [Title0, Title1, Title2];
@@ -33,82 +33,92 @@
 
 <Window name="Terminal" {icon} defaultPos={{ top: '50%', left: '50%' }} bind:maximized>
 	<div
-		class="flex h-[calc(100%-1.75rem)] flex-col items-center justify-center rounded-lg bg-bg px-8 pt-4 pb-24 text-fg"
+		class="flex h-[calc(100%-1.75rem)] flex-col items-stretch justify-between rounded-lg bg-bg p-4 text-fg"
 	>
-		<div class="group/title-stack flex flex-col items-center justify-center">
-			{#each titles as Title, i (i)}
-				<div
-					style:--step={`${32 * i}px`}
-					style:--len={`${(titles.length + 1) * 250}ms`}
-					style:--delay={`${250 * i}ms`}
-					style:--delay-reverse={`${250 * (titles.length - i - 1)}ms`}
-					class="grid-template-[1fr/1fr] -mb-6 grid"
-					aria-label="presentation"
-				>
-					<Title
-						alt="yourmom"
-						class="
-                        invisible col-[1/1] row-[1/1]
-                        animate-[load-anim_var(--len)_linear_var(--delay)_none]
-                        "
-					/>
-					<Title
-						alt="yourmom"
-						class="
-                        col-[1/1] row-[1/1]
-                        opacity-0
-                        transition-opacity delay-(--delay) duration-0 ease-[step-end]
-                        group-focus-within/title-stack:opacity-100 group-focus-within/title-stack:delay-(--delay-reverse)
-                        group-hover/title-stack:opacity-100 group-hover/title-stack:delay-(--delay-reverse)
-                        "
-					/>
-				</div>
-			{/each}
-			<h1
-				style:--len={`${(titles.length + 1) * 250}ms`}
-				style:--delay={`${titles.length * 250}ms`}
-				class="invisible animate-[load-anim_var(--len)_linear_var(--delay)_forwards] font-mono text-6xl font-bold"
-			>
-				Apro
-			</h1>
-		</div>
-		<p class="mt-4 text-center">
-			<Typewriter
-				class="text-xl"
-				phrases={subtitles}
-				mode="random"
-				loadDelay={(titles.length * 2 + 1) * 250}
-				in={{
-					delay: 100,
-					speed: 200
-				}}
-				out={{
-					delay: 1500,
-					speed: 'backspace'
-				}}
-			/>
-		</p>
-
-		<div
-			style:--cols={`repeat(${socials.length}, minmax(0, 1fr))`}
-			class="group/socials mt-4 grid w-112 grid-cols-(--cols) px-8"
-		>
-			{#each socials as { name, icon: Icon, href }, i (name)}
-				<a {href} target="_blank" class="focus:outline-0">
+		<div></div>
+		<div class="flex flex-col items-center justify-center px-4 pb-16">
+			<div class="group/title-stack flex flex-col items-center justify-center">
+				{#each titles as Title, i (i)}
 					<div
-						style:--delay={`${(titles.length * 2 + 1) * 250 + (i + 1) * 200}ms`}
-						class="relative flex w-24 animate-[slide-in_500ms_linear_var(--delay)_forwards] items-center justify-center opacity-0 animation-ease-out-back"
+						style:--step={`${32 * i}px`}
+						style:--len={`${(titles.length + 1) * 250}ms`}
+						style:--delay={`${250 * i}ms`}
+						style:--delay-reverse={`${250 * (titles.length - i - 1)}ms`}
+						class="grid-template-[1fr/1fr] -mb-6 grid"
+						aria-label="presentation"
 					>
-						<span><Icon alt={name} class="size-12 text-center" /></span>
-						<p class="absolute top-[70%] left-[50%] -translate-x-1/2">
-							{name}
-						</p>
+						<Title
+							alt="yourmom"
+							class="
+  	                      invisible col-[1/1] row-[1/1]
+  	                      animate-[load-anim_var(--len)_linear_var(--delay)_none]
+  	                      "
+						/>
+						<Title
+							alt="yourmom"
+							class="
+  	                      col-[1/1] row-[1/1]
+  	                      opacity-0
+  	                      transition-opacity delay-(--delay) duration-0 ease-[step-end]
+  	                      group-focus-within/title-stack:opacity-100 group-focus-within/title-stack:delay-(--delay-reverse)
+  	                      group-hover/title-stack:opacity-100 group-hover/title-stack:delay-(--delay-reverse)
+  	                      "
+						/>
 					</div>
-				</a>
-			{/each}
+				{/each}
+				<h1
+					style:--len={`${(titles.length + 1) * 250}ms`}
+					style:--delay={`${titles.length * 250}ms`}
+					class="invisible animate-[load-anim_var(--len)_linear_var(--delay)_forwards] font-mono text-6xl font-bold"
+				>
+					Apro
+				</h1>
+			</div>
+			<p class="mt-4 text-center">
+				<Typewriter
+					class="text-xl"
+					phrases={subtitles}
+					mode="random"
+					loadDelay={(titles.length * 2 + 1) * 250}
+					in={{
+						delay: 100,
+						speed: 200
+					}}
+					out={{
+						delay: 1500,
+						speed: 'backspace'
+					}}
+				/>
+			</p>
+
+			<div
+				style:--cols={`repeat(${socials.length}, minmax(0, 1fr))`}
+				class="group/socials mt-4 grid w-112 grid-cols-(--cols) px-8"
+			>
+				{#each socials as { name, icon: Icon, href }, i (name)}
+					<a {href} target="_blank" class="focus:outline-0">
+						<div
+							style:--delay={`${(titles.length * 2 + 1) * 250 + (i + 1) * 200}ms`}
+							class="relative flex w-24 animate-[slide-in_500ms_linear_var(--delay)_forwards] items-center justify-center opacity-0 animation-ease-out-back"
+						>
+							<span><Icon alt={name} class="size-12 text-center" /></span>
+							<p class="absolute top-[70%] left-[50%] -translate-x-1/2">
+								{name}
+							</p>
+						</div>
+					</a>
+				{/each}
+			</div>
 		</div>
-	</div>
-</Window>
+		<p class="font-mono">
+			<span class="text-magenta">/home/apro</span><Heart
+				fill="#8ccf7e"
+				strokeWidth={0}
+				class="mx-1 inline-block size-4"
+			/><span class="animate-[fade-in_0.8s_ease-in-out_alternate_infinite]">_</span>
+		</p>
+	</div></Window
+>
 
 <style lang="scss">
 	@use 'sass:math';
