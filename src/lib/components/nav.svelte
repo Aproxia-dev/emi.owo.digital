@@ -1,5 +1,33 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { quintOut } from 'svelte/easing';
+	import { Tween } from 'svelte/motion';
+
+	import { page } from '$app/state';
+
+	let tabs = [
+		{ name: 'Home', href: '/' },
+		{ name: 'About Me', href: '/about-me' },
+		{ name: 'Blog', href: '/blog' },
+		{ name: 'Projects', href: '/projects' }
+	];
+
+	let selectedTab = $derived.by(() => {
+		let path = page.url.pathname.match(/^\/[^/?]*/)[0];
+		return tabs.findIndex((tab) => tab.href == path);
+	});
+
+	let tabSize: number[] = $state([]);
+
+	function getTabSizes() {
+		for (let tab in tabs) {
+			console.log(tab);
+			console.log(typeof tab);
+			tabSize[tab] = document.getElementById(`tab-${tab}`)!.clientWidth;
+		}
+	}
+
+	let glider = $state(undefined);
 
 	function padTime(i: number): string {
 		return i >= 10 ? `${i}` : `0${i}`;
@@ -16,6 +44,23 @@
 	let clockPeriod: string = $derived(today.getHours() <= 12 ? 'AM' : 'PM');
 
 	onMount(() => {
+		getTabSizes();
+		glider = Tween.of(
+			() => {
+				let ret: number = 0;
+				for (let i = 0; i < selectedTab; i++) {
+					ret += tabSize[i];
+					ret += 4;
+				}
+
+				return ret;
+			},
+			{
+				duration: 500,
+				easing: quintOut
+			}
+		);
+
 		const clockInterval = setInterval(() => {
 			today = new Date();
 		}, 1000);
@@ -23,9 +68,45 @@
 </script>
 
 <header
-	class="relative z-1 mx-auto my-2 flex h-8 w-4/5 flex-row items-center justify-between rounded-lg border-2 border-lbg bg-bg px-2 py-0.5 text-fg"
+	class="relative z-1 mx-auto my-2 flex h-8 w-4/5 flex-row items-center justify-between rounded-lg border-2 border-lbg bg-bg px-1 py-0.5 font-mono text-fg"
 >
 	<p>LOGO</p>
-	<nav></nav>
-	<p>{clockTime} <span class="text-red">{clockPeriod}</span></p>
+	<nav class="relative flex items-center justify-around gap-1">
+		{#each tabs as tab, i}
+			<a href={tab.href} id="tab-{i}">
+				<button
+					class={`
+						group/tab flex cursor-pointer items-center justify-center rounded-lg bg-dbg select-none
+						hover:bg-lbg has-active:bg-lbg
+						${selectedTab == i ? 'active' : ''}
+					`}
+				>
+					<div
+						class="grid-template-[1fr/1fr] grid h-full place-items-center *:col-[1/1] *:row-[1/1] *:h-full *:w-6 *:rounded-lg"
+					>
+						<div class="z-3 px-1 text-fg group-[.active]/tab:text-dbg">{i + 1}</div>
+						<div
+							class="bg-transparent group-hover/tab:bg-mbg noscript:group-[.active]/tab:bg-accent"
+						></div>
+					</div>
+					<p class="px-2">
+						{tab.name}
+					</p>
+				</button>
+			</a>
+		{/each}
+		<span
+			style:--pos={`${glider !== undefined ? glider.current : 0}px`}
+			style:visibility={glider !== undefined ? 'visible' : 'hidden'}
+			class="absolute left-(--pos) h-full w-6 rounded-lg bg-accent"
+			aria-roledescription="presentation"
+		></span>
+	</nav>
+	<div class="flex flex-row items-center justify-center gap-1">
+		<p class="cursor-pointer rounded-lg bg-dbg px-1 font-bold text-alt hover:bg-lbg">en</p>
+		<p class="cursor-pointer rounded-lg bg-dbg px-1 hover:bg-lbg">
+			{clockTime}
+			<span class="text-red">{clockPeriod}</span>
+		</p>
+	</div>
 </header>
