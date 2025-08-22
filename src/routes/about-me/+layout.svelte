@@ -50,7 +50,7 @@
 {/snippet}
 
 <Window name="About Me" {icon} defaultPos={{ top: '50%', left: '50%' }} maximizable={false}>
-	<div class="flex w-112 flex-col items-center justify-center gap-4 rounded-lg bg-bg p-4 text-fg">
+	<div class="flex w-112 flex-col items-center justify-center gap-2 rounded-lg bg-bg p-4 text-fg">
 		<div class="flex w-full flex-row items-center justify-around">
 			<img
 				src={true ? profilePicture : 'https://avatars.githubusercontent.com/u/53254254?v=4'}
@@ -82,14 +82,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="flex w-full flex-row flex-nowrap items-center justify-center gap-8">
+		<div class="mt-2 flex w-full flex-row flex-nowrap items-center justify-center gap-2">
 			{#each tabs as tab, i (tab.href)}
 				<a
 					href={`/about-me${tab.href}`}
 					class={`
-						group/link flex-1 cursor-pointer rounded-lg p-1 text-center font-bold
-						transition-colors duration-200 ease-out-sine
-						${selectedTab === i ? 'active bg-green text-lbg transition-none' : ''}
+						group/link flex-1 cursor-pointer rounded-lg p-1 text-center
+						font-bold transition-colors duration-200 ease-out-sine
+						${selectedTab === i ? 'active bg-green text-lbg transition-none' : 'bg-lbg'}
 					`}
 				>
 					<span
