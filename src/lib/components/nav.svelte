@@ -13,7 +13,7 @@
 	];
 
 	let selectedTab = $derived.by(() => {
-		let path = page.url.pathname.match(/^\/[^/?]*/)[0];
+		let path = page.url.pathname.match(/\/[^/?]*/g)[0];
 		return tabs.findIndex((tab) => tab.href == path);
 	});
 
@@ -21,8 +21,6 @@
 
 	function getTabSizes() {
 		for (let tab in tabs) {
-			console.log(tab);
-			console.log(typeof tab);
 			tabSize[tab] = document.getElementById(`tab-${tab}`)!.clientWidth;
 		}
 	}
@@ -84,7 +82,7 @@
 					<div
 						class="grid-template-[1fr/1fr] grid h-full place-items-center *:col-[1/1] *:row-[1/1] *:h-full *:w-6 *:rounded-lg"
 					>
-						<div class="z-3 px-1 text-fg group-[.active]/tab:text-dbg">{i + 1}</div>
+						<div class="z-2 px-1 text-fg group-[.active]/tab:text-dbg">{i + 1}</div>
 						<div
 							class="bg-transparent group-hover/tab:bg-mbg noscript:group-[.active]/tab:bg-accent"
 						></div>
@@ -98,7 +96,7 @@
 		<span
 			style:--pos={`${glider !== undefined ? glider.current : 0}px`}
 			style:visibility={glider !== undefined ? 'visible' : 'hidden'}
-			class="absolute left-(--pos) h-full w-6 rounded-lg bg-accent"
+			class="absolute left-(--pos) z-1 h-full w-6 rounded-lg bg-accent"
 			aria-roledescription="presentation"
 		></span>
 	</nav>

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import { browser } from '$app/environment';
-	import type { Warning } from 'svelte/types/compiler/interfaces';
 
 	let {
 		name,
 		icon,
+		maximizable = true,
 		maximized = $bindable(false),
 		class: className = '',
 		defaultPos = {
@@ -16,6 +16,7 @@
 	}: {
 		name: string;
 		icon: Snippet;
+		maximizable: boolean;
 		maximized: boolean;
 		class: string;
 		defaultPos: {
@@ -83,11 +84,20 @@
 		<p class="text-center">{name}</p>
 		<div class="flex flex-row items-center justify-end gap-1">
 			<button
-				class="diamond size-4 bg-green hover:cursor-pointer hover:brightness-80"
-				onclick={() => (maximized = !maximized)}
+				class={`diamond size-4 ${maximizable ? 'bg-green hover:cursor-pointer hover:brightness-80' : 'bg-mfg'}`}
+				aria-label="maximize"
+				onclick={() => {
+					if (maximizable === true) maximized = !maximized;
+				}}
 			></button>
-			<button class="diamond size-4 bg-yellow hover:cursor-pointer hover:brightness-80"></button>
-			<button class="diamond size-4 bg-red hover:cursor-pointer hover:brightness-80"></button>
+			<button
+				class="diamond size-4 bg-yellow hover:cursor-pointer hover:brightness-80"
+				aria-label="minimize (decoration only)"
+			></button>
+			<button
+				class="diamond size-4 bg-red hover:cursor-pointer hover:brightness-80"
+				aria-label="close (decoration only)"
+			></button>
 		</div>
 	</div>
 	{@render children()}

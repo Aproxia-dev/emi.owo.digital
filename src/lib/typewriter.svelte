@@ -6,7 +6,7 @@
 		class: className = '',
 		mode,
 		animating = $bindable(true),
-		loadDelay,
+		loadDelay = 0,
 		in: inOpts = {
 			delay,
 			speed
