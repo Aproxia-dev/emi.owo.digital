@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { page } from '$app/state';
+
 	import Typewriter from '$lib/typewriter.svelte';
 	import Window from '$lib/components/window.svelte';
 
@@ -24,7 +26,7 @@
 		{ name: 'Discord', icon: DiscordIcon, href: 'https://youtube.com/watch?v=dQw4w9WgXcQ' }
 	];
 
-	let maximized = $state(false);
+	let maximized = $state(page.url.searchParams.get('maximized') == '1');
 </script>
 
 {#snippet icon()}

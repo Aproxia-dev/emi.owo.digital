@@ -27,7 +27,7 @@
 	let unhinged = page.url.searchParams.has('unhinged');
 
 	let selectedTab = $derived.by(() => {
-		let path = (page.url.pathname + '/').match(/\/[^/?]*/g)[1];
+		let path = (page.url.pathname + '/').match(/\/[^/?]*/g)![1];
 		return tabs.findIndex((tab) => tab.href == path);
 	});
 
@@ -55,7 +55,7 @@
 	<div class="flex w-112 flex-col items-center justify-center gap-2 rounded-lg bg-bg p-4 text-fg">
 		<div class="flex w-full flex-row items-center justify-around">
 			<img
-				src={true ? profilePicture : 'https://avatars.githubusercontent.com/u/53254254?v=4'}
+				src={profilePicture}
 				alt={`${info[0]}'s profile picture`}
 				class="mx-2 aspect-square size-40 rounded-lg border-2 border-mbg"
 			/>

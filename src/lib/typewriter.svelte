@@ -1,26 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
+	/* eslint-disable svelte/no-unused-props */
 	let {
 		phrases,
 		class: className = '',
 		mode,
 		animating = $bindable(true),
 		loadDelay = 0,
-		in: inOpts = {
-			delay,
-			speed
-		},
-		out: outOpts = {
-			delay,
-			speed
-		}
+		in: inOpts,
+		out: outOpts
 	}: {
 		phrases: string[];
-		class: string;
+		class?: string;
 		mode: 'sequential' | 'random';
-		animating: boolean;
-		loadDelay: number;
+		animating?: boolean;
+		loadDelay?: number;
 		in: {
 			delay: number;
 			speed: number;
@@ -30,6 +25,7 @@
 			speed: number | 'backspace';
 		};
 	} = $props();
+	/* eslint-enable svelte/no-unused-props */
 
 	let index: number = $state(mode == 'sequential' ? 0 : Math.floor(Math.random() * phrases.length));
 	let displayed = $state('');

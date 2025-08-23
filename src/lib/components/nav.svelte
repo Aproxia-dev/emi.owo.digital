@@ -13,7 +13,7 @@
 	];
 
 	let selectedTab = $derived.by(() => {
-		let path = page.url.pathname.match(/\/[^/?]*/g)[0];
+		let path = page.url.pathname.match(/\/[^/?]*/g)![0];
 		return tabs.findIndex((tab) => tab.href == path);
 	});
 
@@ -25,7 +25,7 @@
 		}
 	}
 
-	let glider = $state(undefined);
+	let glider: Tween<number> | undefined = $state(undefined);
 
 	function padTime(i: number): string {
 		return i >= 10 ? `${i}` : `0${i}`;
@@ -59,6 +59,7 @@
 			}
 		);
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const clockInterval = setInterval(() => {
 			today = new Date();
 		}, 1000);
@@ -72,7 +73,7 @@
 >
 	<p>LOGO</p>
 	<nav class="relative flex items-center justify-around gap-1">
-		{#each tabs as tab, i}
+		{#each tabs as tab, i (tab.name)}
 			<a href={`${tab.href}${unhinged ? '?unhinged=1' : ''}`} id="tab-{i}">
 				<button
 					class={`

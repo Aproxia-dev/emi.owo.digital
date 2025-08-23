@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
+	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 
 	let {
@@ -16,12 +17,12 @@
 	}: {
 		name: string;
 		icon: Snippet;
-		maximizable: boolean;
-		maximized: boolean;
-		class: string;
+		maximizable?: boolean;
+		maximized?: boolean;
+		class?: string;
 		defaultPos: {
-			top: string;
-			left: string;
+			top?: string;
+			left?: string;
 		};
 		children: Snippet;
 	} = $props();
@@ -68,7 +69,7 @@
 </script>
 
 <div
-	class={`absolute top-(--top) left-(--left) z-0 rounded-xl bg-accent p-1 ${mounted ? '-translate-x-1/2' : '-translate-1/2'} ${maximized ? '!top-12 !left-1/2 h-[calc(100vh-3.5rem)] w-[calc(100vw-1rem)]' : 'size-fit'} ${className}`}
+	class={`absolute top-(--top) left-(--left) z-0 rounded-xl bg-accent p-1 ${mounted || maximized ? '-translate-x-1/2' : '-translate-1/2'} ${maximized ? '!top-12 !left-1/2 !h-[calc(100vh-3.5rem)] !w-[calc(100vw-1rem)]' : 'size-fit'} ${className}`}
 	style:--top={`calc(${defaultPos.top} + ${app.top}px)`}
 	style:--left={`calc(${defaultPos.left} + ${app.left}px)`}
 	bind:this={window}
@@ -89,7 +90,14 @@
 				onclick={() => {
 					if (maximizable === true) maximized = !maximized;
 				}}
-			></button>
+			>
+				{#if maximizable}
+					<a
+						class="hidden size-full noscript:block"
+						href={`?maximized=${maximized ? '0' : '1'}${page.url.searchParams.get('unhinged') == '1' ? '&unhinged=1' : ''}`}
+					></a>
+				{/if}
+			</button>
 			<button
 				class="diamond size-4 bg-yellow hover:cursor-pointer hover:brightness-80"
 				aria-label="minimize (decoration only)"
