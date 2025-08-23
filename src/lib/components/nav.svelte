@@ -63,6 +63,8 @@
 			today = new Date();
 		}, 1000);
 	});
+
+	let unhinged = page.url.searchParams.has('unhinged');
 </script>
 
 <header
@@ -71,7 +73,7 @@
 	<p>LOGO</p>
 	<nav class="relative flex items-center justify-around gap-1">
 		{#each tabs as tab, i}
-			<a href={tab.href} id="tab-{i}">
+			<a href={`${tab.href}${unhinged ? '?unhinged=1' : ''}`} id="tab-{i}">
 				<button
 					class={`
 						group/tab flex cursor-pointer items-center justify-center rounded-lg bg-dbg select-none

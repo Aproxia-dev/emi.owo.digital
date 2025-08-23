@@ -1,21 +1,25 @@
-[
-    "nerd ass idiot",
-    "the forp!",
-    "pronoun collector",
-    "gay fuck",
-    "hermit moder",
-    "proud degenerate",
-    "girl (maybe) fox (definitely)",
-    "xenia in irl (woa)",
-    "uwu (real)",
-    "all in le head",
-    "certified vimbo",
-    "neo sissy girl",
-    "haver of severe aneurizzm",
-    "cerebrum consumer",
-    "kitsugay,, !!!!",
-    "nixbian boober",
-    "h4xx0r (L0L)",
-    "fogmaxxing so hard rn",
-    "adult child junior adulter"
-]
+{
+	"safe": [
+		"annoying nerd",
+		"the forp!",
+		"girl (maybe) fox (definitely)",
+		"xenia in irl (woa)",
+		"certified vimbo",
+		"haver of severe aneurizzm",
+		"cerebrum consumer",
+		"kitsugay,, !!!!",
+		"h4xx0r (L0L)",
+		"still figuring out oxygen",
+		"pronoun collector",
+		"uwu (real)",
+		"the floofiest"
+	],
+	"unhinged": [
+		"fogmaxxing so hard rn",
+		"neo sissy girl",
+		"all in le head",
+		"gay fuck",
+		"hermit moder",
+		"proud degenerate"
+	]
+}

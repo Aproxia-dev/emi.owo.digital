@@ -14,7 +14,7 @@
 	let info: { key: string; value: string }[] = [
 		{ key: 'Name', value: 'Emi' },
 		{ key: 'Age', value: String(calcAge('2005-01-17')) },
-		{ key: 'Pronouns', value: 'they/she/it/vi' }
+		{ key: 'Pronouns', value: 'they/she/it' }
 	];
 
 	let tabs: { name: string; href: string }[] = [
@@ -23,6 +23,8 @@
 		{ name: 'Setup', href: '/setup' },
 		{ name: 'Socials', href: '/socials' }
 	];
+
+	let unhinged = page.url.searchParams.has('unhinged');
 
 	let selectedTab = $derived.by(() => {
 		let path = (page.url.pathname + '/').match(/\/[^/?]*/g)[1];
@@ -61,7 +63,7 @@
 				<h1 class="text-3xl">Aproxia</h1>
 				<Typewriter
 					class="font-mono text-xs"
-					phrases={nameTitles}
+					phrases={unhinged ? nameTitles.safe.concat(nameTitles.unhinged) : nameTitles.safe}
 					mode="random"
 					in={{
 						delay: 100,
@@ -85,7 +87,7 @@
 		<div class="mt-2 flex w-full flex-row flex-nowrap items-center justify-center gap-2">
 			{#each tabs as tab, i (tab.href)}
 				<a
-					href={`/about-me${tab.href}`}
+					href={`/about-me${tab.href}${unhinged ? '?unhinged=1' : ''}`}
 					class={`
 						group/link flex-1 cursor-pointer rounded-lg p-1 text-center
 						font-bold transition-colors duration-200 ease-out-sine
