@@ -83,21 +83,26 @@
 			{@render icon()}
 		</div>
 		<p class="text-center">{name}</p>
-		<div class="flex flex-row items-center justify-end gap-1">
-			<button
-				class={`diamond size-4 ${maximizable ? 'bg-green hover:cursor-pointer hover:brightness-80' : 'bg-mfg'}`}
+		<div class="flex flex-row items-center justify-end gap-1 select-all">
+			<a
+				id="maximize"
+				class="flex h-full w-fit {!maximizable ? 'pointer-events-none' : ''}"
 				aria-label="maximize"
-				onclick={() => {
+				href={`?${[
+					!maximized ? 'maximized=1' : undefined,
+					page.url.searchParams.get('unhinged') == '1' ? 'unhinged=1' : undefined
+				]
+					.filter((param) => param !== undefined)
+					.join('&')}`}
+				onclick={(e) => {
+					e.preventDefault();
 					if (maximizable === true) maximized = !maximized;
 				}}
+				><button
+					aria-labelledby="maximize"
+					class={`diamond size-4 ${maximizable ? 'bg-green hover:cursor-pointer hover:brightness-80' : 'bg-mfg'}`}
+				></button></a
 			>
-				{#if maximizable}
-					<a
-						class="hidden size-full noscript:block"
-						href={`?maximized=${maximized ? '0' : '1'}${page.url.searchParams.get('unhinged') == '1' ? '&unhinged=1' : ''}`}
-					></a>
-				{/if}
-			</button>
 			<button
 				class="diamond size-4 bg-yellow hover:cursor-pointer hover:brightness-80"
 				aria-label="minimize (decoration only)"

@@ -8,8 +8,7 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	declare module 'postcss-easings';
 }
-
-declare module 'postcss-easings';
 
 export {};

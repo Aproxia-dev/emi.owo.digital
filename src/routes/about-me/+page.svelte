@@ -15,8 +15,8 @@
 			internet!
 		</p>
 		<p>
-			I'm a self-taught software developer, designer, sysadmin and artist who simply enjoys making
-			things!
+			I'm a <i class="text-xs">practically</i> self-taught software developer, designer, sysadmin and
+			artist who simply enjoys making things!
 		</p>
 		<p>
 			I am non-binary and use
