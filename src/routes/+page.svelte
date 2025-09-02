@@ -26,7 +26,6 @@
 		{ name: 'Discord', icon: DiscordIcon, href: 'https://youtube.com/watch?v=dQw4w9WgXcQ' }
 	];
 
-	let unhinged = page.url.searchParams.get('unhinged') == '1';
 	let maximized = $state(page.url.searchParams.get('maximized') == '1');
 </script>
 
@@ -80,7 +79,7 @@
 			<p class="mt-4 text-center">
 				<Typewriter
 					class="text-xl"
-					phrases={unhinged ? subtitles.safe.concat(subtitles.unhinged) : subtitles.safe}
+					phrases={subtitles}
 					mode="random"
 					loadDelay={(titles.length * 2 + 1) * 250}
 					in={{

@@ -88,10 +88,7 @@
 				id="maximize"
 				class="flex h-full w-fit {!maximizable ? 'pointer-events-none' : ''}"
 				aria-label="maximize"
-				href={`?${[
-					!maximized ? 'maximized=1' : undefined,
-					page.url.searchParams.get('unhinged') == '1' ? 'unhinged=1' : undefined
-				]
+				href={`?${[!maximized ? 'maximized=1' : undefined]
 					.filter((param) => param !== undefined)
 					.join('&')}`}
 				onclick={(e) => {

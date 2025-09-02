@@ -24,8 +24,6 @@
 		{ name: 'Socials', href: '/socials' }
 	];
 
-	let unhinged = page.url.searchParams.has('unhinged');
-
 	let selectedTab = $derived.by(() => {
 		let path = (page.url.pathname + '/').match(/\/[^/?]*/g)![1];
 		return tabs.findIndex((tab) => tab.href == path);
@@ -63,7 +61,7 @@
 				<h1 class="text-3xl">Aproxia</h1>
 				<Typewriter
 					class="font-mono text-xs"
-					phrases={unhinged ? nameTitles.safe.concat(nameTitles.unhinged) : nameTitles.safe}
+					phrases={nameTitles}
 					mode="random"
 					in={{
 						delay: 100,
@@ -87,7 +85,7 @@
 		<div class="mt-2 flex w-full flex-row flex-nowrap items-center justify-center gap-2">
 			{#each tabs as tab, i (tab.href)}
 				<a
-					href={`/about-me${tab.href}${unhinged ? '?unhinged=1' : ''}`}
+					href={`/about-me${tab.href}`}
 					class={`
 						group/link flex-1 cursor-pointer rounded-lg p-1 text-center
 						font-bold transition-colors duration-200 ease-out-sine
